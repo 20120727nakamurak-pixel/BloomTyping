@@ -88,7 +88,7 @@ button{font:inherit;cursor:default;pointer-events:none;user-select:none}
 <div class="app">
   <div class="topbar">
     <div class="brand">◆ BLOOM TYPING</div>
-    <div class="pill">プロトタイプ v28 · モード選択画面修正</div>
+    <div class="pill">プロトタイプ V28</div>
   </div>
 
   <section id="home" class="screen active">
@@ -98,7 +98,7 @@ button{font:inherit;cursor:default;pointer-events:none;user-select:none}
         <div class="pill">最高スコア <strong id="homeBest">0</strong></div>
       </div>
       <div class="home-title">Bloom Typing</div>
-      <div class="tagline">タイピングで、少しずつ成長しよう。</div>
+      <div class="tagline">タイピングで、花が咲く。</div>
       <button class="home-difficulty" id="difficultyToggle" onclick="toggleDifficultyPanel()" aria-expanded="false"><span class="label">難易度選択 · Shift</span><strong id="currentDifficultyLabel">Bud Mode</strong></button>
       <div class="difficulty-panel" id="difficultyPanel" style="display:none" aria-label="難易度選択">
         <div class="difficulty-options">
@@ -106,7 +106,7 @@ button{font:inherit;cursor:default;pointer-events:none;user-select:none}
           <button class="difficulty-option selected" id="difficultyBud" onclick="chooseDifficulty(1)"><strong>Bud</strong><small>標準ルール</small></button>
           <button class="difficulty-option" id="difficultyBloom" onclick="chooseDifficulty(2)"><strong>Bloom</strong><small>上級者向け</small></button>
         </div>
-        <div class="home-key-hint">← ↑ ↓ → で選択　·　Enterで確定　·　Escでキャンセル</div>
+        <div class="home-key-hint">← → で選択　·　Enterで確定　·　Escでキャンセル</div>
       </div>
       <div class="home-primary-row" id="home-primary-row" aria-label="ホームメニュー">
         <button class="home-nav-button" id="modeShop" onclick="activateHomeItem(0)">お店<small>アイテムを購入</small></button>
@@ -155,22 +155,22 @@ button{font:inherit;cursor:default;pointer-events:none;user-select:none}
         <div class="status" id="status">物理キーボードで入力してね</div>
       </div>
     </div>
-    <div class="note" style="text-align:center">Backspace または H：ホームへ戻る</div><div class="controls"><button class="secondary" onclick="goHome()">ホームへ戻る（Backspace）</button></div>
+    <div class="note" style="text-align:center">Backspace でホームに戻る</div><div class="controls"><button class="secondary" onclick="goHome()">ホームへ戻る（Backspace）</button></div>
   </section>
 
   <section id="shop" class="screen">
     <div class="page-head"><div><h2>お店</h2><div class="note">強化は購入した次のRoundだけ有効</div></div><div class="pill">🪙 <strong id="shopCoins">0</strong></div></div>
     <div class="shop-grid" id="shopGrid"></div>
-    <div class="toast" id="shopToast"></div><div class="note" style="text-align:center">← ↑ / → ↓：商品選択　Enter：購入　Backspace または H：ホームへ</div>
-    <div class="note" style="text-align:center">Backspace または H：ホームへ戻る</div><div class="controls"><button class="secondary" onclick="goHome()">ホームへ戻る（Backspace）</button></div>
+    <div class="toast" id="shopToast"></div><div class="note" style="text-align:center">← / →：商品選択　Enter：購入　Backspace でホームへ</div>
+    <div class="note" style="text-align:center">Backspace でホームへ戻る</div><div class="controls"><button class="secondary" onclick="goHome()">ホームへ戻る（Backspace）</button></div>
   </section>
 
 
   <section id="inventory" class="screen">
-    <div class="page-head"><div><h2>持ち物</h2><div class="note">装備したアイテムは、次のRound開始時に1回分消費して効果を発揮するよ。</div></div><div class="pill">所持品</div></div>
+    <div class="page-head"><div><h2>持ち物</h2><div class="note">装備したアイテムは、次のRound開始時に1回分消費して効果を発揮する。</div></div><div class="pill">所持品</div></div>
     <div class="shop-grid" id="inventoryGrid"></div>
-    <div class="toast" id="inventoryToast"></div><div class="note" style="text-align:center">← ↑ / → ↓：アイテム選択　Enter：装備切替　Backspace または H：ホームへ</div>
-    <div class="note" style="text-align:center">Backspace または H：ホームへ戻る</div><div class="controls"><button class="secondary" onclick="goHome()">ホームへ戻る（Backspace）</button></div>
+    <div class="toast" id="inventoryToast"></div><div class="note" style="text-align:center">← / →：アイテム選択　Enter：装備切替　Backspace または H：ホームへ</div>
+    <div class="note" style="text-align:center">Backspace　でホームに戻る</div><div class="controls"><button class="secondary" onclick="goHome()">ホームへ戻る（Backspace）</button></div>
   </section>
 
   <section id="result" class="screen">
@@ -182,7 +182,7 @@ button{font:inherit;cursor:default;pointer-events:none;user-select:none}
       <div class="result-line"><span>平均打鍵数</span><strong><span id="resultAverageKpm">— → 0</span> 打鍵/分</strong></div>
       <div class="result-line"><span>正確率</span><strong id="resultAccuracy">— → 100%</strong></div>
       <div class="result-line"><span>所持コイン</span><strong id="resultWallet">0</strong></div>
-      <p class="note">「←→」キーで選択、「Enter」キーで決定</p>
+      <p class="note">「← →」キーで選択、「Enter」キーで決定</p>
       <div class="controls result-actions"><button class="primary" onclick="restartFromBeginning()">もう1度</button><button class="secondary" onclick="goHome()">ホームへ</button><button class="secondary" onclick="showShop()">お店へ</button></div>
     </div></div>
   </section>
