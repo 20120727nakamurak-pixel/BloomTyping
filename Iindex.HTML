@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bloom Typing v31 - Sound Update</title>
+<style>
+:root{
+  --bg:#081426;--panel:#0b1d33;--panel2:#102844;--line:#315575;
+  --text:#eef6ff;--muted:#91aac5;--green:#26d68a;--gold:#ffc56a;
+  --blue:#43b6ff;--danger:#ff6b76;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:
+ radial-gradient(ellipse at 50% 0%,#17375a 0%,transparent 55%),
+ linear-gradient(150deg,#071326,#0a1b30 65%,#102a48);
+ color:var(--text);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}
+button{font:inherit;cursor:default;pointer-events:none;user-select:none}
+.app{max-width:1080px;margin:auto;padding:20px}
+.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;color:var(--muted);font-size:14px;margin-bottom:18px}
+.brand{font-weight:800;letter-spacing:.08em;color:#f2f7ff}
+.pill{border:1px solid var(--line);background:#0a1a2e;border-radius:999px;padding:8px 13px}
+.screen{display:none}.screen.active{display:block}
+.home{min-height:76vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;position:relative;overflow:hidden}
+.home:before{content:"";position:absolute;inset:5% 0;background:radial-gradient(ellipse at center,#18385a66,transparent 60%);pointer-events:none}
+.home-title{font-size:clamp(32px,6vw,58px);font-weight:900;letter-spacing:.06em;text-shadow:0 5px 24px #0008;z-index:1}
+.tagline{color:var(--muted);margin-top:-12px;margin-bottom:22px;z-index:1}
+.home-mode-row{display:flex;align-items:center;justify-content:center;gap:clamp(12px,4vw,42px);z-index:1;width:100%;margin:4px 0 14px}.home-mode{border:0;background:transparent;color:#8aa1ba;opacity:.55;padding:10px 4px;min-width:90px;max-width:30%;transition:transform .15s,opacity .15s,color .15s;text-align:center}.home-mode strong{display:block;font-size:clamp(18px,3.5vw,28px)}.home-mode small{display:block;font-size:11px;margin-top:4px}.home-mode.selected{opacity:1;color:#f2f8ff;transform:scale(1.08);text-shadow:0 0 22px #43b6ff55}.home-mode.selected strong{font-size:clamp(24px,4.5vw,36px)}.mode-arrow{color:#6e8aa8;font-size:24px;user-select:none}.home-stats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;z-index:1;margin-bottom:10px}
+.home-difficulty{z-index:2;border:1px solid #34516d;background:#0a1a2eaa;color:#dceafa;border-radius:12px;padding:7px 14px;min-width:150px;text-align:center;cursor:pointer;margin:0 0 4px}.home-difficulty .label{display:block;font-size:11px;color:var(--muted);margin-bottom:2px}.home-difficulty strong{font-size:16px}.difficulty-panel{z-index:3;width:min(620px,100%);border:1px solid #34516d;background:#09182bf5;border-radius:18px;padding:14px;margin:0 0 4px;box-shadow:0 16px 45px #0007}.difficulty-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.difficulty-option{background:#10243a;border:1px solid #34516d;border-radius:12px;padding:12px 6px;color:#c8d7e8;min-height:82px}.difficulty-option strong{display:block;font-size:clamp(15px,2.8vw,21px)}.difficulty-option small{display:block;font-size:11px;margin-top:5px;color:#91a8c0}.difficulty-option.selected{border:2px solid #43b6ff;background:#143554;color:#fff;box-shadow:0 0 18px #43b6ff22}.home-primary-row{z-index:1;display:grid;grid-template-columns:1fr 1.25fr 1fr;align-items:center;gap:clamp(8px,2vw,22px);width:min(700px,100%);margin-top:10px}.home-nav-button{border:1px solid #34516d;background:linear-gradient(145deg,#122943,#0a1a2d);color:#eaf4ff;border-radius:16px;padding:16px 8px;min-height:70px;font-size:clamp(16px,3vw,22px);font-weight:800}.home-nav-button small{display:block;font-size:11px;font-weight:500;color:#9db2c9;margin-top:4px}.home-nav-button.primary-start{border:2px solid #48d99b;background:linear-gradient(145deg,#15513e,#0c3029);font-size:clamp(20px,3.5vw,28px);box-shadow:0 8px 24px #20b87920}.home-nav-button.selected{outline:2px solid #43b6ff;outline-offset:2px}.home-key-hint{z-index:1;color:var(--muted);font-size:12px;text-align:center;margin-top:2px}
+
+.menu-button{width:min(420px,100%);border-radius:24px;padding:22px 26px;display:flex;align-items:center;gap:22px;text-align:left;color:white;border:2px solid;box-shadow:0 12px 28px #0004;transition:transform .15s}
+.menu-button:hover{transform:translateY(-2px)}
+.menu-button .symbol{font-size:40px;width:64px;text-align:center}
+.menu-button strong{display:block;font-size:27px}
+.menu-button small{display:block;margin-top:3px;color:#d3e2f2}
+.battle-btn{background:linear-gradient(135deg,#123c66,#0b2745);border-color:#43b6ff}
+.shop-btn{background:linear-gradient(135deg,#244b3e,#16352f);border-color:#7ee19a}
+.battle-layout{display:grid;grid-template-columns:1fr;gap:14px}
+.timer-panel,.prompt-panel,.hp-panel,.keyboard-panel,.result-card,.upgrade-card,.info-panel{border:1px solid var(--line);background:linear-gradient(160deg,#0c2037ee,#08182bee);border-radius:18px;box-shadow:0 10px 25px #0002}
+.timer-panel{padding:14px 18px}
+.timer-row{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:14px}
+.timer{font-size:34px;color:var(--gold);font-weight:850;font-variant-numeric:tabular-nums}
+.bar{height:9px;background:#1c3857;border-radius:99px;overflow:hidden;margin-top:7px}
+.bar>div{height:100%;width:100%;background:linear-gradient(90deg,#ffd36f,#ff9e54);transition:width .15s}
+.prompt-panel{min-height:235px;padding:28px 18px;display:flex;flex-direction:column;justify-content:center;align-items:stretch;text-align:center;position:relative;overflow:hidden}
+.prompt-panel:after{content:"";position:absolute;width:220px;height:100px;bottom:-52px;background:#1c5b79;filter:blur(50px);opacity:.28}
+.start-overlay{min-height:175px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;position:relative;z-index:2}.start-mark{width:66px;height:66px;border-radius:18px;display:grid;place-items:center;font-size:34px;font-weight:900;color:#062416;background:linear-gradient(145deg,#58f0ad,#1bbf7b);box-shadow:0 0 30px #26d68a55}.start-instruction{font-size:clamp(23px,4vw,32px);font-weight:850}.start-sub{font-size:14px;color:var(--muted)}#promptContent{width:100%;position:relative;z-index:1}.prompt-stats-layout{width:100%;display:grid;grid-template-columns:minmax(0,1fr) 190px;align-items:center;gap:22px}.prompt-core{text-align:center;min-width:0}.live-stats{display:flex;flex-direction:column;gap:16px;text-align:left;border-left:1px solid #294663;padding-left:20px}.live-stat-label{font-size:13px;color:var(--muted);letter-spacing:.04em}.live-stat-value{font-size:clamp(25px,3.4vw,36px);font-weight:850;font-variant-numeric:tabular-nums;line-height:1.2;color:#f0f6ff;margin-top:4px}.live-stat-unit{font-size:13px;color:#9eb5cc;font-weight:600;margin-left:4px}.live-stat + .live-stat{padding-top:13px;border-top:1px solid #294663}.enemy-label{font-size:12px;color:var(--muted);letter-spacing:.2em;margin-bottom:14px}
+.reading{font-size:17px;letter-spacing:.28em;color:#afc3d8;margin-bottom:5px}
+.japanese{font-size:clamp(30px,5vw,48px);font-weight:850;line-height:1.25;margin-bottom:12px}
+.romaji{font-size:clamp(21px,3.4vw,29px);font-weight:750;letter-spacing:.025em;overflow-wrap:anywhere}
+.next-prompt{margin-top:20px;color:#7891ab;opacity:.62;font-size:clamp(16px,2.6vw,21px);font-weight:650}.next-prompt-label{font-size:13px;letter-spacing:.04em;margin-right:7px;color:#71869d}.next-prompt ruby rt{font-size:.48em;color:#8ca0b5;letter-spacing:.08em}.romaji .done{color:#7891ab}.romaji .next{color:var(--green);text-shadow:0 0 18px #26d68a55}.romaji .rest{color:#f0f6ff}
+.hp-panel{padding:15px 18px}
+.hp-row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700}
+.hp-bar{height:12px;background:#1b3651;border-radius:99px;overflow:hidden;margin-top:10px}
+.hp-fill{height:100%;width:100%;background:linear-gradient(90deg,#27d59a,#62e6b0);transition:width .2s}
+.keyboard-panel{padding:16px;max-width:650px;width:100%;margin:auto}
+.kb-title{text-align:center;color:var(--muted);font-size:12px;letter-spacing:.1em;margin-bottom:12px}
+.keyboard{display:grid;gap:7px}
+.key-row{display:flex;justify-content:center;gap:6px}
+.key{height:43px;min-width:0;flex:1;max-width:53px;border:1px solid #355575;border-radius:8px;background:linear-gradient(#1b3655,#132a45);display:flex;align-items:center;justify-content:center;color:#dbe9f8;font-size:16px;font-weight:650;box-shadow:0 3px 0 #071426;transition:.1s}
+.key.lit{background:linear-gradient(#3df0a1,#18a96d);color:#052719;border-color:#7affc2;box-shadow:0 0 15px #24e69a66,0 3px 0 #0a6847;transform:translateY(-1px)}
+.key.dim{opacity:.55}
+.status{text-align:center;min-height:24px;color:var(--muted);font-size:13px;margin-top:12px}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.secondary,.primary{border-radius:12px;padding:10px 18px;border:1px solid var(--line);background:#102944;color:var(--text)}
+.primary{background:linear-gradient(135deg,#1763a0,#124879);border-color:#43b6ff;font-weight:750}
+.page-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0 18px}
+.page-head h2{margin:0;font-size:28px}
+.shop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.upgrade-card{padding:18px;display:flex;flex-direction:column;gap:10px}.upgrade-card.keyboard-selected{border-color:var(--green);box-shadow:0 0 0 2px #26d68a66,0 10px 25px #0003;transform:translateY(-2px)}
+.upgrade-icon{font-size:30px}.upgrade-card h3{margin:0}.upgrade-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.55;flex:1}
+.price{color:var(--gold);font-weight:800}.upgrade-card button{width:100%}
+.upgrade-card button:disabled{opacity:.4;cursor:not-allowed}
+.note{color:var(--muted);font-size:13px;line-height:1.6}
+.result-wrap{min-height:65vh;display:grid;place-items:center}
+.result-card{width:min(520px,100%);padding:28px;text-align:center}
+.result-card h2{font-size:32px;margin:0 0 22px}
+.result-score{font-size:38px;color:var(--gold);font-weight:900}
+.result-line{display:flex;justify-content:space-between;border-top:1px solid #294663;padding:13px 0;color:var(--muted)}
+.result-line strong{color:var(--text)}
+.boss-badge{font-size:12px;color:#ffcf83;border:1px solid #795a2e;padding:4px 9px;border-radius:999px}
+.toast{min-height:22px;text-align:center;color:var(--green);font-size:13px;margin-top:8px}
+@media(max-width:600px){.prompt-stats-layout{grid-template-columns:minmax(0,1fr) 118px;gap:10px}.live-stats{padding-left:10px;gap:12px}.live-stat-value{font-size:23px}.live-stat-label{font-size:11px}.prompt-panel{padding:22px 12px}}
+@media(max-width:700px){.app{padding:12px}.shop-grid{grid-template-columns:1fr}.menu-button{padding:18px}.prompt-panel{min-height:205px}.key{height:36px;font-size:14px;border-radius:6px}.key-row{gap:4px}.keyboard{gap:6px}.page-head h2{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">◆ BLOOM TYPING</div>
+    <div class="pill">プロトタイプ v28 · モード選択画面修正</div>
+  </div>
+
+  <section id="home" class="screen active">
+    <div class="home">
+      <div class="home-stats">
+        <div class="pill">🪙 所持コイン <strong id="homeCoins">0</strong></div>
+        <div class="pill">最高スコア <strong id="homeBest">0</strong></div>
+      </div>
+      <div class="home-title">Bloom Typing</div>
+      <div class="tagline">タイピングで、少しずつ成長しよう。</div>
+      <button class="home-difficulty" id="difficultyToggle" onclick="toggleDifficultyPanel()" aria-expanded="false"><span class="label">難易度選択 · Shift</span><strong id="currentDifficultyLabel">Bud Mode</strong></button>
+      <div class="difficulty-panel" id="difficultyPanel" style="display:none" aria-label="難易度選択">
+        <div class="difficulty-options">
+          <button class="difficulty-option" id="difficultySeed" onclick="chooseDifficulty(0)"><strong>Seed</strong><small>気軽に練習</small></button>
+          <button class="difficulty-option selected" id="difficultyBud" onclick="chooseDifficulty(1)"><strong>Bud</strong><small>標準ルール</small></button>
+          <button class="difficulty-option" id="difficultyBloom" onclick="chooseDifficulty(2)"><strong>Bloom</strong><small>上級者向け</small></button>
+        </div>
+        <div class="home-key-hint">← ↑ ↓ → で選択　·　Enterで確定　·　Escでキャンセル</div>
+      </div>
+      <div class="home-primary-row" id="home-primary-row" aria-label="ホームメニュー">
+        <button class="home-nav-button" id="modeShop" onclick="activateHomeItem(0)">お店<small>アイテムを購入</small></button>
+        <button class="home-nav-button primary-start selected" id="modeBattle" onclick="activateHomeItem(1)">スタート<small>タイピング開始</small></button>
+        <button class="home-nav-button" id="modeInventory" onclick="activateHomeItem(2)">持ち物<small>アイテムを装備</small></button>
+      </div>
+      <div class="home-key-hint" id="homeModeHint">← → で選択　·　Enterで決定　·　Shiftで難易度変更</div>
+    </div>
+  </section>
+
+  <section id="battle" class="screen">
+    <div class="page-head">
+      <div><h2 id="roundTitle">ROUND 1</h2><div class="note" id="enemyCount">敵 1 / 10</div></div>
+      <span class="boss-badge" id="bossBadge" style="display:none">BOSS</span>
+    </div>
+    <div class="battle-layout">
+      <div class="timer-panel">
+        <div class="timer-row"><span>◷ 制限時間</span><span class="timer" id="timer">15</span></div>
+        <div class="bar"><div id="timerFill"></div></div>
+      </div>
+      <div class="prompt-panel">
+        <div id="startOverlay" class="start-overlay" style="display:none"><div class="start-mark">S</div><div class="start-instruction">「S」キーでスタート</div><div class="start-sub">準備ができたら S を押してください</div></div>
+        <div id="promptContent">
+          <div class="prompt-stats-layout">
+            <div class="prompt-core">
+              <div class="enemy-label">ENEMY</div>
+              <div class="reading" id="reading">ひまですね</div>
+              <div class="japanese" id="japanese">暇ですね</div>
+              <div class="romaji" id="romaji"></div>
+            </div>
+            <aside class="live-stats" aria-live="polite">
+              <div class="live-stat"><div class="live-stat-label">打鍵数/分</div><div class="live-stat-value"><span id="liveKpm">0</span><span class="live-stat-unit">打/分</span></div></div>
+              <div class="live-stat"><div class="live-stat-label">正確性(%)</div><div class="live-stat-value"><span id="liveAccuracy">100</span><span class="live-stat-unit">%</span></div></div>
+            </aside>
+          </div>
+          <div class="next-prompt" id="nextPrompt" style="display:none"></div>
+        </div>
+      </div>
+      <div class="hp-panel">
+        <div class="hp-row"><span>♥ PLAYER HP</span><span><span id="hpText">100</span> / <span id="maxHpText">100</span></span></div>
+        <div class="hp-bar"><div class="hp-fill" id="hpFill"></div></div>
+      </div>
+      <div class="keyboard-panel">
+        <div class="kb-title">KEYBOARD DISPLAY · 表示専用</div>
+        <div id="keyboard" class="keyboard"></div>
+        <div class="status" id="status">物理キーボードで入力してね</div>
+      </div>
+    </div>
+    <div class="note" style="text-align:center">Backspace または H：ホームへ戻る</div><div class="controls"><button class="secondary" onclick="goHome()">ホームへ戻る（Backspace）</button></div>
+  </section>
+
+  <section id="shop" class="screen">
+    <div class="page-head"><div><h2>お店</h2><div class="note">強化は購入した次のRoundだけ有効</div></div><div class="pill">🪙 <strong id="shopCoins">0</strong></div></div>
+    <div class="shop-grid" id="shopGrid"></div>
+    <div class="toast" id="shopToast"></div><div class="note" style="text-align:center">← ↑ / → ↓：商品選択　Enter：購入　Backspace または H：ホームへ</div>
+    <div class="note" style="text-align:center">Backspace または H：ホームへ戻る</div><div class="controls"><button class="secondary" onclick="goHome()">ホームへ戻る（Backspace）</button></div>
+  </section>
+
+
+  <section id="inventory" class="screen">
+    <div class="page-head"><div><h2>持ち物</h2><div class="note">装備したアイテムは、次のRound開始時に1回分消費して効果を発揮するよ。</div></div><div class="pill">所持品</div></div>
+    <div class="shop-grid" id="inventoryGrid"></div>
+    <div class="toast" id="inventoryToast"></div><div class="note" style="text-align:center">← ↑ / → ↓：アイテム選択　Enter：装備切替　Backspace または H：ホームへ</div>
+    <div class="note" style="text-align:center">Backspace または H：ホームへ戻る</div><div class="controls"><button class="secondary" onclick="goHome()">ホームへ戻る（Backspace）</button></div>
+  </section>
+
+  <section id="result" class="screen">
+    <div class="result-wrap"><div class="result-card">
+      <h2 id="resultTitle">Round 終了</h2>
+      <div class="note">獲得スコア</div><div class="result-score" id="resultScore">0</div>
+      <div class="result-line"><span>獲得コイン（スコアの1/100、Bloomは2倍）</span><strong id="earnedCoins">0</strong></div>
+      <div class="result-line"><span>残りHP</span><strong id="resultHp">0 / 100</strong></div>
+      <div class="result-line"><span>平均打鍵数</span><strong><span id="resultAverageKpm">— → 0</span> 打鍵/分</strong></div>
+      <div class="result-line"><span>正確率</span><strong id="resultAccuracy">— → 100%</strong></div>
+      <div class="result-line"><span>所持コイン</span><strong id="resultWallet">0</strong></div>
+      <p class="note">「←→」キーで選択、「Enter」キーで決定</p>
+      <div class="controls result-actions"><button class="primary" onclick="restartFromBeginning()">もう1度</button><button class="secondary" onclick="goHome()">ホームへ</button><button class="secondary" onclick="showShop()">お店へ</button></div>
+    </div></div>
+  </section>
+</div>
+<script>
+// Each Round samples ten distinct prompts from the full pool so newly added text can appear immediately.
+const prompts = [
+  {reading:"ひまですね", text:"暇ですね", romaji:"himadesune"},
+  {reading:"いいてんき", text:"良い天気", romaji:"iitennki"},
+  {reading:"じゃんぷ", text:"ジャンプ", romaji:"jannpu"},
+  {reading:"ねむいからすぐふとんにはいりました", text:"眠いからすぐ布団に入りました", romaji:"nemuikarasugufutonnnihairimashita"},
+  {reading:"しょうりんじけんぽう", text:"少林寺拳法", romaji:"shourinnjikennpou"},
+  {reading:"びょうどういんほうおうどう", text:"平等院鳳凰堂", romaji:"byoudouinnhououdou"},
+  {reading:"おはようございます", text:"おはようございます", romaji:"ohayougozaimasu"},
+  {reading:"ありがとう", text:"ありがとう", romaji:"arigatou"},
+  {reading:"またあした", text:"また明日", romaji:"mataashita"},
+  {reading:"みずをのみます", text:"水を飲みます", romaji:"mizuwonomimasu"},
+  {reading:"ねこがねています", text:"猫が寝ています", romaji:"nekoganeteimasu"},
+  {reading:"いぬとさんぽ", text:"犬と散歩", romaji:"inutosannpo"},
+  {reading:"あめがふっています", text:"雨が降っています", romaji:"amegafutteimasu"},
+  {reading:"ほんをよみます", text:"本を読みます", romaji:"honnwoyomimasu"},
+  {reading:"でんしゃにのります", text:"電車に乗ります", romaji:"dennshaninorimasu"},
+  {reading:"えきまであるきます", text:"駅まで歩きます", romaji:"ekimadearukimasu"},
+  {reading:"きょうはさむいです", text:"今日は寒いです", romaji:"kyouhasamuidesu"},
+  {reading:"あしたははれです", text:"明日は晴れです", romaji:"ashitahaharedesu"},
+  {reading:"おいしいらーめん", text:"おいしいラーメン", romaji:"oishiira-menn"},
+  {reading:"たまごやきをつくる", text:"卵焼きを作る", romaji:"tamagoyakiwotsukuru"},
+  {reading:"こうえんであそぶ", text:"公園で遊ぶ", romaji:"kouenndeasobu"},
+  {reading:"ともだちとべんきょう", text:"友達と勉強", romaji:"tomodachitobennkyou"},
+  {reading:"まいにちれんしゅう", text:"毎日練習", romaji:"mainichirennshuu"},
+  {reading:"しゅくだいがおわりました", text:"宿題が終わりました", romaji:"shukudaigaowarimashita"},
+  {reading:"きゅうけいしましょう", text:"休憩しましょう", romaji:"kyuukeishimashou"},
+  {reading:"ちいさなはな", text:"小さな花", romaji:"chiisanahana"},
+  {reading:"しゃしんをとります", text:"写真を撮ります", romaji:"shashinnwotorimasu"},
+  {reading:"じかんをまもろう", text:"時間を守ろう", romaji:"jikannwomamorou"},
+  {reading:"ゆうびんきょく", text:"郵便局", romaji:"yuubinnkyoku"},
+  {reading:"せかいりょこう", text:"世界旅行", romaji:"sekairyokou"},
+  {reading:"うちゅうのほし", text:"宇宙の星", romaji:"uchuunohoshi"},
+  {reading:"たいせつなやくそく", text:"大切な約束", romaji:"taisetsunayakusoku"},
+  {reading:"まどをあけてください", text:"窓を開けてください", romaji:"madowoaketekudasai"},
+  {reading:"あたらしいことにちょうせん", text:"新しいことに挑戦", romaji:"atarashiikotonichousenn"},
+  {reading:"らいしゅうはりょこうです", text:"来週は旅行です", romaji:"raishuuharyokoudesu"},
+  {reading:"まけずにがんばろう", text:"負けずに頑張ろう", romaji:"makezunigannbarou"},
+  {reading:"みんなでちからをあわせる", text:"みんなで力を合わせる", romaji:"minnnadechikarawoawaseru"},
+  {reading:"あさはやくおきる", text:"朝早く起きる", romaji:"asahayakuokiru"},
+  {reading:"よるははやくねよう", text:"夜は早く寝よう", romaji:"yoruhahayakuneyou"},
+  {reading:"まいにちみずをのむ", text:"毎日水を飲む", romaji:"mainichimizuwonomu"},
+  {reading:"あきのそらはたかい", text:"秋の空は高い", romaji:"akinosorahatakai"},
+  {reading:"はるになるとはながさく", text:"春になると花が咲く", romaji:"haruninarutohanagasaku"},
+  {reading:"なつやすみがたのしみ", text:"夏休みが楽しみ", romaji:"natsuyasumigatanoshimi"},
+  {reading:"ふゆはあたたかいふく", text:"冬は暖かい服", romaji:"fuyuhaatatakaifuku"},
+  {reading:"かぜがつよくふいている", text:"風が強く吹いている", romaji:"kazegatsuyokufuiteiru"},
+  {reading:"そらににじがかかった", text:"空に虹がかかった", romaji:"soraninijigakakatta"},
+  {reading:"ほしがきれいにみえる", text:"星がきれいに見える", romaji:"hoshigakireinimieru"},
+  {reading:"うみのむこうへいこう", text:"海の向こうへ行こう", romaji:"uminomukouheikou"},
+  {reading:"やまのてんきはかわりやすい", text:"山の天気は変わりやすい", romaji:"yamanotennkihakawariyasui"},
+  {reading:"かわのそばをあるく", text:"川のそばを歩く", romaji:"kawanosobawoaruku"},
+  {reading:"もりのなかでやすむ", text:"森の中で休む", romaji:"morinonakadeyasumu"},
+  {reading:"ちずをみてみちをさがす", text:"地図を見て道を探す", romaji:"chizuwomitemichiwosagasu"},
+  {reading:"えんぴつでなまえをかく", text:"鉛筆で名前を書く", romaji:"ennpitsudenamaewokaku"},
+  {reading:"じしょでことばをしらべる", text:"辞書で言葉を調べる", romaji:"jishodekotobawoshiraberu"},
+  {reading:"ほんだなをせいりする", text:"本棚を整理する", romaji:"honndanawoseirisuru"},
+  {reading:"まどのそとをながめる", text:"窓の外を眺める", romaji:"madonosotowonagameru"},
+  {reading:"へやをきれいにそうじする", text:"部屋をきれいに掃除する", romaji:"heyawokireinisoujisuru"},
+  {reading:"あたらしいくつをかった", text:"新しい靴を買った", romaji:"atarashiikutsuwokatta"},
+  {reading:"かさをわすれないでね", text:"傘を忘れないでね", romaji:"kasawowasurenaidene"},
+  {reading:"おなかがすいてきた", text:"お腹が空いてきた", romaji:"onakagasuitekita"},
+  {reading:"あたたかいおちゃをのむ", text:"温かいお茶を飲む", romaji:"atatakaiochawonomu"},
+  {reading:"やさいをたくさんたべよう", text:"野菜をたくさん食べよう", romaji:"yasaiwotakusanntabeyou"},
+  {reading:"きょうのよるごはんはかれー", text:"今日の夜ご飯はカレー", romaji:"kyounoyorugohannhakare-"},
+  {reading:"あまいものはべつばら", text:"甘いものは別腹", romaji:"amaimonohabetsubara"},
+  {reading:"りょうりはあいじょうがたいせつ", text:"料理は愛情が大切", romaji:"ryourihaaijougataisetsu"},
+  {reading:"たまにはゆっくりやすもう", text:"たまにはゆっくり休もう", romaji:"tamanihayukkuriyasumou"},
+  {reading:"からだをうごかしてきぶんてんかん", text:"体を動かして気分転換", romaji:"karadawougokashitekibunntennkann"},
+  {reading:"じかんにゆとりをもとう", text:"時間にゆとりを持とう", romaji:"jikannniyutoriwomotou"},
+  {reading:"ちいさなことからはじめよう", text:"小さなことから始めよう", romaji:"chiisanakotokarahajimeyou"},
+  {reading:"まちがいはせいちょうのたね", text:"間違いは成長の種", romaji:"machigaihaseichounotane"},
+  {reading:"なんどでもちょうせんしよう", text:"何度でも挑戦しよう", romaji:"nanndodemochousennshiyou"},
+  {reading:"あきらめずにつづけよう", text:"あきらめずに続けよう", romaji:"akiramezunitsudukeyou"},
+  {reading:"できることからすこしずつ", text:"できることから少しずつ", romaji:"dekirukotokarasukoshizutsu"},
+  {reading:"まえをむいてあるこう", text:"前を向いて歩こう", romaji:"maewomuitearukou"},
+  {reading:"えがおはまわりをあかるくする", text:"笑顔は周りを明るくする", romaji:"egaohamawariwoakarukusuru"},
+  {reading:"ことばにはちからがある", text:"言葉には力がある", romaji:"kotobanihachikaragaaru"},
+  {reading:"こころをこめてつたえよう", text:"心を込めて伝えよう", romaji:"kokorowokometetsutaeyou"},
+  {reading:"いしのうえにもさんねん", text:"石の上にも三年", romaji:"ishinouenimosannnenn"},
+  {reading:"いそがばまわれ", text:"急がば回れ", romaji:"isogabamaware"},
+  {reading:"さるもきからおちる", text:"猿も木から落ちる", romaji:"sarumokikaraochiru"},
+  {reading:"ちりもつもればやまとなる", text:"塵も積もれば山となる", romaji:"chirimotsumorebayamatonaru"},
+  {reading:"わらうかどにはふくきたる", text:"笑う門には福来る", romaji:"waraukadonihafukukitaru"},
+  {reading:"ななころびやおき", text:"七転び八起き", romaji:"nanakorobiyaoki"},
+  {reading:"はやおきはさんもんのとく", text:"早起きは三文の得", romaji:"hayaokihasannmonnnotoku"},
+  {reading:"すきこそもののじょうずなれ", text:"好きこそものの上手なれ", romaji:"sukikosomononojouzunare"},
+  {reading:"ろんよりしょうこ", text:"論より証拠", romaji:"ronnyorishouko"},
+  {reading:"かっぱのかわながれ", text:"河童の川流れ", romaji:"kappanokawanagare"},
+  {reading:"ねこにこばん", text:"猫に小判", romaji:"nekonikobann"},
+  {reading:"ぶたにしんじゅ", text:"豚に真珠", romaji:"butanishinnju"},
+  {reading:"いぬもあるけばぼうにあたる", text:"犬も歩けば棒に当たる", romaji:"inumoarukebabouniataru"},
+  {reading:"あとのまつり", text:"後の祭り", romaji:"atonomatsuri"},
+  {reading:"あたまかくしてしりかくさず", text:"頭隠して尻隠さず", romaji:"atamakakushiteshirikakusazu"},
+  {reading:"はなよりだんご", text:"花より団子", romaji:"hanayoridanngo"},
+  {reading:"おににかなぼう", text:"鬼に金棒", romaji:"oninikanabou"},
+  {reading:"みからでたさび", text:"身から出た錆", romaji:"mikaradetasabi"},
+  {reading:"ひとのふりみてわがふりなおせ", text:"人の振り見て我が振り直せ", romaji:"hitonofurimitewagafurinaose"},
+  {reading:"たなからぼたもち", text:"棚からぼた餅", romaji:"tanakarabotamochi"},
+  {reading:"かめのこうよりとしのこう", text:"亀の甲より年の功", romaji:"kamenokouyoritoshinokou"},
+  {reading:"いっせきにちょう", text:"一石二鳥", romaji:"issekinichou"},
+  {reading:"いちごいちえ", text:"一期一会", romaji:"ichigoichie"},
+  {reading:"しんしゅつきぼつ", text:"神出鬼没", romaji:"shinnshutsukibotsu"},
+  {reading:"いっきいちゆう", text:"一喜一憂", romaji:"ikkiichiyuu"},
+  {reading:"じがじさん", text:"自画自賛", romaji:"jigajisann"},
+  {reading:"ききいっぱつ", text:"危機一髪", romaji:"kikiippatsu"},
+  {reading:"しこうさくご", text:"試行錯誤", romaji:"shikousakugo"},
+  {reading:"ぜんりょくとうきゅう", text:"全力投球", romaji:"zennryokutoukyuu"},
+  {reading:"いみしんちょう", text:"意味深長", romaji:"imishinnchou"},
+  {reading:"しんらばんしょう", text:"森羅万象", romaji:"shinnrabannshou"},
+  {reading:"ゆうおうまいしん", text:"勇往邁進", romaji:"yuuoumaishinn"},
+  {reading:"きょうみしんしん", text:"興味津々", romaji:"kyoumishinnshinn"},
+  {reading:"あんぜんだいいち", text:"安全第一", romaji:"annzenndaiichi"},
+  {reading:"いちねんのけいはがんたんにあり", text:"一年の計は元旦にあり", romaji:"ichinennnokeihaganntannniari"},
+  {reading:"てんさいはどりょくのたまもの", text:"天才は努力の賜物", romaji:"tennsaihadoryokunotamamono"},
+  {reading:"こういんやのごとし", text:"光陰矢の如し", romaji:"kouinnyanogotoshi"},
+  {reading:"しっぱいはせいこうのもと", text:"失敗は成功のもと", romaji:"shippaihaseikounomoto"},
+  {reading:"ひゃくぶんはいっけんにしかず", text:"百聞は一見にしかず", romaji:"hyakubunnhaikkennnishikazu"},
+  {reading:"いちにちいっぽ", text:"一日一歩", romaji:"ichinichiippo"},
+  {reading:"きゅうそくもたいせつ", text:"休息も大切", romaji:"kyuusokumotaisetsu"},
+  {reading:"みんなでちからをあわせよう", text:"みんなで力を合わせよう", romaji:"minnnadechikarawoawaseyou"},
+  {reading:"あんしんしてまかせて", text:"安心して任せて", romaji:"annshinnshitemakasete"},
+  {reading:"でんきをけしてねよう", text:"電気を消して寝よう", romaji:"dennkiwokeshiteneyou"},
+  {reading:"きょうはなんようびですか", text:"今日は何曜日ですか", romaji:"kyouhanannyoubidesuka"},
+  {reading:"えきでともだちとまちあわせ", text:"駅で友達と待ち合わせ", romaji:"ekidetomodachitomachiawase"},
+  {reading:"こうさてんではとまろう", text:"交差点では止まろう", romaji:"kousatenndehatomarou"},
+  {reading:"みちをゆずるやさしさ", text:"道を譲る優しさ", romaji:"michiwoyuzuruyasashisa"},
+  {reading:"きそくただしいせいかつ", text:"規則正しい生活", romaji:"kisokutadashiiseikatsu"},
+  {reading:"まいにちこつこつがんばる", text:"毎日こつこつ頑張る", romaji:"mainichikotsukotsugannbaru"},
+  {reading:"ゆめにむかってすすもう", text:"夢に向かって進もう", romaji:"yumenimukattesusumou"},
+  {reading:"あしたのじぶんにできること", text:"明日の自分にできること", romaji:"ashitanojibunnnidekirukoto"},
+  {reading:"おたがいにたすけあおう", text:"お互いに助け合おう", romaji:"otagainitasukeaou"},
+  {reading:"ひとやすみしてからつづけよう", text:"一休みしてから続けよう", romaji:"hitoyasumishitekaratsudukeyou"},
+  {reading:"しずかなところでしゅうちゅうする", text:"静かなところで集中する", romaji:"shizukanatokorodeshuuchuusuru"},
+  {reading:"あんぜんにきをつけよう", text:"安全に気をつけよう", romaji:"annzennnikiwotsukeyou"},
+  {reading:"ひろいせかいをみてみたい", text:"広い世界を見てみたい", romaji:"hiroisekaiwomitemitai"},
+  {reading:"ことばをたいせつにしよう", text:"言葉を大切にしよう", romaji:"kotobawotaisetsunishiyou"},
+  {reading:"きょうもいちにちおつかれさま", text:"今日も一日お疲れさま", romaji:"kyoumoichinichiotsukaresama"},
+  {reading:"あんこはつぶあんはこしあんは", text:"あんこは粒あん派？こしあん派？", romaji:"annkohatsubuannhakoshiannha"},
+  {reading:"ちょうせつはむずかしい", text:"調節は難しい", romaji:"chousetsuhamuzukashii"},
+  {reading:"おんがくをききながらべんきょう", text:"音楽を聴きながら勉強", romaji:"onngakuwokikinagarabennkyou"},
+  {reading:"まんてんのほしぞら", text:"満点の星空", romaji:"manntennnohoshizora"},
+  {reading:"でんせつのけんじゃ", text:"伝説の賢者", romaji:"dennsetsunokennja"},
+  {reading:"むりせずじぶんのぺーすで", text:"無理せず自分のペースで", romaji:"murisezujibunnnope-sude"},
+];
+const keyRows = ["qwertyuiop","asdfghjkl","zxcvbnm"];
+const upgrades = [
+ {id:"typo",icon:"⬡",name:"ミス耐性",desc:"ミス時のダメージを軽減します。",price:500,effect:"ミスダメージ 5 → 3"},
+ {id:"timeout",icon:"⌛",name:"時間切れ耐性",desc:"時間切れ時のダメージを軽減します。",price:500,effect:"時間切れダメージ 10 → 6"},
+ {id:"time",icon:"◷",name:"時間延長",desc:"各問題の制限時間を延長します。",price:800,effect:"制限時間 ＋5秒"}
+];
+let coins=0,best=0,round=1,hp=100,maxHp=100,enemyIndex=0,queue=[],current=null,elapsed=0,limit=0,tick=null,typed="",mistakes=0,totalChars=0,correctChars=0,roundStart=0,battleStartedAt=0,activeUpgrades={typo:false,timeout:false,time:false},roundScore=0,lastResultKpm=null,lastResultAccuracy=null;
+let resultSelection=0;
+const inventory={typo:0,timeout:0,time:0};const equipped={typo:false,timeout:false,time:false};let homeMode=1,shopSelection=0,inventorySelection=0;let difficulty=1,draftDifficulty=1,difficultyOpen=false;
+// Bloom Typing v31: lightweight synthesized sound effects (no external audio files).
+let bloomAudioCtx=null;
+function audioContext(){
+ try{
+  if(!bloomAudioCtx){const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return null;bloomAudioCtx=new Ctx();}
+  if(bloomAudioCtx.state==="suspended")bloomAudioCtx.resume();
+  return bloomAudioCtx;
+ }catch(_){return null;}
+}
+function tone(ctx,frequency,start,duration,volume,wave="sine",endFrequency=null){
+ const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=wave;osc.frequency.setValueAtTime(frequency,start);
+ if(endFrequency!==null)osc.frequency.exponentialRampToValueAtTime(Math.max(1,endFrequency),start+duration);
+ gain.gain.setValueAtTime(0.0001,start);gain.gain.linearRampToValueAtTime(volume,start+Math.min(0.012,duration*0.25));gain.gain.exponentialRampToValueAtTime(0.0001,start+duration);
+ osc.connect(gain);gain.connect(ctx.destination);osc.start(start);osc.stop(start+duration+0.015);
+}
+function softNoise(ctx,start,duration,volume,cutoff){
+ const length=Math.max(1,Math.floor(ctx.sampleRate*duration)),buffer=ctx.createBuffer(1,length,ctx.sampleRate),data=buffer.getChannelData(0);
+ for(let i=0;i<length;i++)data[i]=Math.random()*2-1;
+ const source=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),gain=ctx.createGain();source.buffer=buffer;filter.type="lowpass";filter.frequency.value=cutoff;filter.Q.value=0.7;
+ gain.gain.setValueAtTime(volume,start);gain.gain.exponentialRampToValueAtTime(0.0001,start+duration);source.connect(filter);filter.connect(gain);gain.connect(ctx.destination);source.start(start);source.stop(start+duration);
+}
+function playBloomSound(kind){
+ const ctx=audioContext();if(!ctx)return;const t=ctx.currentTime+0.002;
+ if(kind==="type"){
+  // A short, mellow mid-register "pi" with a soft, rounded attack.
+  tone(ctx,660,t,0.075,0.045,"sine");tone(ctx,990,t+0.003,0.045,0.009,"sine");
+ }else if(kind==="mistype"){
+  // Slightly firmer wooden tap: muted body plus a tiny filtered contact sound.
+  tone(ctx,235,t,0.085,0.055,"triangle",155);softNoise(ctx,t,0.022,0.022,1500);
+ }else if(kind==="ui"){
+  // Rounded, natural-feeling little wooden seed tap.
+  tone(ctx,390,t,0.095,0.040,"sine",285);softNoise(ctx,t,0.018,0.010,1100);
+ }else if(kind==="clear"){
+  // Two gentle piano-like notes for a small, warm success cue.
+  tone(ctx,523.25,t,0.24,0.065,"triangle");tone(ctx,659.25,t+0.105,0.34,0.060,"triangle");
+  tone(ctx,783.99,t+0.11,0.25,0.014,"sine");
+ }
+}
+function show(id){const old=document.querySelector(".screen.active");const changed=!old||old.id!==id;document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active",s.id===id)); if(id==="result")renderResultSelection();if(changed&&["home","shop","inventory"].includes(id))playBloomSound("ui");}
+function goHome(){stopTimer();updateWallet();show("home");renderHomeModes();}
+function renderHomeModes(){
+ const ids=["modeShop","modeBattle","modeInventory"];
+ ids.forEach((id,i)=>document.getElementById(id).classList.toggle("selected",i===homeMode));
+ const names=["お店","スタート","持ち物"];
+ document.getElementById("homeModeHint").textContent= difficultyOpen ? "← ↑ ↓ → で難易度を選択 · Enterで確定 · Escでキャンセル" : "← → で「お店 ← スタート → 持ち物」を選択 · Enterで決定 · Shiftで難易度変更";
+ document.getElementById("currentDifficultyLabel").textContent=["Seed Mode","Bud Mode","Bloom Mode"][difficulty];
+ ["difficultySeed","difficultyBud","difficultyBloom"].forEach((id,i)=>document.getElementById(id).classList.toggle("selected",i===(difficultyOpen?draftDifficulty:difficulty)));
+ document.getElementById("difficultyPanel").style.display=difficultyOpen?"block":"none";
+ document.getElementById("home-primary-row").style.display=difficultyOpen?"none":"grid";
+ document.getElementById("homeModeHint").style.display=difficultyOpen?"none":"block";
+ document.getElementById("difficultyToggle").setAttribute("aria-expanded",String(difficultyOpen));
+}
+function selectHomeMode(index){homeMode=(index+3)%3;renderHomeModes();}
+function activateHomeMode(){activateHomeItem(homeMode);}
+function activateHomeItem(index){if(difficultyOpen)return;playBloomSound("ui");homeMode=index;renderHomeModes();if(homeMode===0)showShop();else if(homeMode===1)startRound();else showInventory();}
+function toggleDifficultyPanel(){if(!difficultyOpen)draftDifficulty=difficulty;difficultyOpen=!difficultyOpen;renderHomeModes();}
+function chooseDifficulty(index){difficulty=index;draftDifficulty=index;difficultyOpen=false;renderHomeModes();}
+function moveDraftDifficulty(index){draftDifficulty=(index+3)%3;renderHomeModes();}
+function showInventory(){stopTimer();renderInventory();show("inventory");}
+function updateWallet(){document.getElementById("homeCoins").textContent=coins.toLocaleString();document.getElementById("shopCoins").textContent=coins.toLocaleString();document.getElementById("homeBest").textContent=best.toLocaleString();}
+function showShop(){stopTimer();renderShop();show("shop");}
+function renderShop(){
+ const grid=document.getElementById("shopGrid");grid.innerHTML="";
+ upgrades.forEach(u=>{
+  const stock=inventory[u.id];
+  const card=document.createElement("div");card.className="upgrade-card";
+  card.innerHTML=`<div class="upgrade-icon">${u.icon}</div><h3>${u.name}</h3><p>${u.desc}<br><span class="note">${u.effect}</span></p><div class="price">🪙 ${u.price}</div><div class="note">持ち物：${stock}個</div><button class="primary" ${coins<u.price?'disabled':''}>${coins<u.price?'コイン不足':'購入する'}</button>`;
+  card.querySelector("button").onclick=()=>{if(coins>=u.price){coins-=u.price;inventory[u.id]++;document.getElementById("shopToast").textContent=u.name+"を持ち物に追加したよ。装備すると効果が発動するよ！";updateWallet();renderShop();}};
+  grid.appendChild(card);
+ });
+ updateCardSelection("shopGrid");
+}
+function renderInventory(){
+ const grid=document.getElementById("inventoryGrid");grid.innerHTML="";
+ upgrades.forEach(u=>{
+  const count=inventory[u.id],isEquipped=equipped[u.id];
+  const card=document.createElement("div");card.className="upgrade-card";
+  card.innerHTML=`<div class="upgrade-icon">${u.icon}</div><h3>${u.name}</h3><p>${u.desc}<br><span class="note">${u.effect}</span></p><div class="note">所持数：${count}個</div><div class="note">${isEquipped?"装備中":"未装備"}</div><button class="${isEquipped?"secondary":"primary"}" ${(!isEquipped&&count<1)?"disabled":""}>${isEquipped?"装備を外す":count<1?"在庫なし":"装備する"}</button>`;
+  card.querySelector("button").onclick=()=>{
+   if(equipped[u.id]){equipped[u.id]=false;document.getElementById("inventoryToast").textContent=u.name+"の装備を外したよ。";}
+   else if(inventory[u.id]>0){equipped[u.id]=true;document.getElementById("inventoryToast").textContent=u.name+"を装備したよ！次のRound開始時に使われるよ。";}
+   renderInventory();
+  };
+  grid.appendChild(card);
+ });
+ updateCardSelection("inventoryGrid");
+}
+function updateCardSelection(gridId){
+ const grid=document.getElementById(gridId);
+ const index=gridId==="shopGrid"?shopSelection:inventorySelection;
+ const cards=[...grid.querySelectorAll(".upgrade-card")];
+ if(cards.length){const safe=Math.max(0,Math.min(index,cards.length-1));if(gridId==="shopGrid")shopSelection=safe;else inventorySelection=safe;cards.forEach((card,i)=>card.classList.toggle("keyboard-selected",i===safe));}
+}
+function moveCardSelection(gridId,delta){
+ const grid=document.getElementById(gridId);const cards=grid.querySelectorAll(".upgrade-card");if(!cards.length)return;
+ if(gridId==="shopGrid")shopSelection=(shopSelection+delta+cards.length)%cards.length;else inventorySelection=(inventorySelection+delta+cards.length)%cards.length;
+ updateCardSelection(gridId);
+}
+function activateSelectedCard(gridId){
+ playBloomSound("ui");
+ const grid=document.getElementById(gridId);const index=gridId==="shopGrid"?shopSelection:inventorySelection;
+ const card=grid.querySelectorAll(".upgrade-card")[index];const button=card&&card.querySelector("button");if(button&&!button.disabled)button.click();
+}
+function renderResultSelection(){
+ const actions=[...document.querySelectorAll(".result-actions button")];
+ actions.forEach((b,i)=>{b.style.outline=i===resultSelection?"2px solid var(--green)":"none";b.style.outlineOffset="3px";});
+}
+function moveResultSelection(delta){resultSelection=(resultSelection+delta+3)%3;renderResultSelection();}
+function activateResultSelection(){
+ playBloomSound("ui");
+ if(resultSelection===0)restartFromBeginning();
+ else if(resultSelection===1)goHome();
+ else showShop();
+}
+function startRound(){
+ stopTimer();maxHp=difficulty===2?50:100;hp=maxHp;enemyIndex=0;mistakes=0;totalChars=0;correctChars=0;roundStart=performance.now();
+ queue=[...prompts].sort(()=>Math.random()-0.5).slice(0,10);
+ // Last encounter is the boss and contains several sequential prompts in this lightweight prototype.
+ current=queue[0];typed="";document.getElementById("roundTitle").textContent="ROUND "+round;
+ show("battle");loadEnemy();document.getElementById("status").textContent="SキーでRoundを開始 · "+["Seed Mode","Bud Mode","Bloom Mode"][difficulty];
+ waitingStart=true;document.getElementById("startOverlay").style.display="flex";document.getElementById("promptContent").style.display="none";
+ renderKeys();updateHP();
+}
+let waitingStart=false,started=false;
+function beginBattle(){if(!waitingStart)return;
+ activeUpgrades={typo:false,timeout:false,time:false};
+ if(difficulty!==2){upgrades.forEach(u=>{if(equipped[u.id]&&inventory[u.id]>0){activeUpgrades[u.id]=true;inventory[u.id]--;equipped[u.id]=false;}});}
+ waitingStart=false;document.getElementById("startOverlay").style.display="none";document.getElementById("promptContent").style.display="block";started=true;battleStartedAt=performance.now();loadEnemy();startTimer();updateLiveStats();document.getElementById("status").textContent="入力開始！";}
+function loadEnemy(){
+ current=queue[enemyIndex];typed="";elapsed=0;
+ const n=[...current.reading].length;
+ const normalLimit=Math.ceil(n*1.5)+(enemyIndex===queue.length-1?10:0)+(activeUpgrades.time?5:0);
+ limit=difficulty===0?Infinity:(difficulty===2?normalLimit/2:normalLimit);
+ document.getElementById("reading").textContent=current.reading;
+ document.getElementById("japanese").textContent=current.text;
+ const nextPrompt=document.getElementById("nextPrompt");
+ const next=queue[enemyIndex+1];
+ if(next){nextPrompt.style.display="block";nextPrompt.innerHTML=`<span class="next-prompt-label">Next：</span><ruby>${next.text}<rt>${next.reading}</rt></ruby>`;}
+ else{nextPrompt.style.display="none";nextPrompt.innerHTML="";}
+ document.getElementById("bossBadge").style.display=enemyIndex===queue.length-1?"inline-block":"none";
+ document.getElementById("enemyCount").textContent=`敵 ${enemyIndex+1} / ${queue.length}`;
+ renderRomaji();renderKeys();updateTimer();
+}
+function stopTimer(){if(tick){clearInterval(tick);tick=null;}started=false;waitingStart=false;}
+function startTimer(){stopTimer();started=true;if(difficulty===0){updateTimer();return;}tick=setInterval(()=>{elapsed+=.1;if(elapsed>=limit){elapsed=limit;updateTimer();updateLiveStats();timeoutHit();return;}updateTimer();updateLiveStats();},100);}
+function updateTimer(){if(difficulty===0){document.getElementById("timer").textContent="∞";document.getElementById("timerFill").style.width="100%";return;}document.getElementById("timer").textContent=Math.max(0,limit-elapsed).toFixed(1);document.getElementById("timerFill").style.width=(Math.max(0,limit-elapsed)/limit*100)+"%";}
+function updateLiveStats(){const seconds=battleStartedAt?Math.max(.001,(performance.now()-battleStartedAt)/1000):0;const kpm=seconds?Math.round(totalChars/seconds*60):0;const accuracy=totalChars?Math.round(correctChars/totalChars*100):100;document.getElementById("liveKpm").textContent=kpm.toLocaleString();document.getElementById("liveAccuracy").textContent=accuracy;}
+function updateHP(){document.getElementById("hpText").textContent=hp;document.getElementById("maxHpText").textContent=maxHp;document.getElementById("hpFill").style.width=(hp/maxHp*100)+"%";document.getElementById("hpFill").style.background=hp<=30?"linear-gradient(90deg,#ff6475,#ff8c6b)":"linear-gradient(90deg,#27d59a,#62e6b0)";}
+function renderRomaji(){
+ const el=document.getElementById("romaji");
+ // If the typed prefix matches an alternate spelling, show that spelling on screen too.
+ // Keep the canonical spelling until the user's input distinguishes an alternative.
+ const paths=acceptedPaths();
+ const target=paths.find(path=>path.startsWith(typed)) || current.romaji;
+ el.innerHTML=[...target].map((c,i)=>`<span class="${i<typed.length?'done':i===typed.length?'next':'rest'}">${c}</span>`).join("");
+}
+function acceptedPaths(){
+ // Canonical spelling is shown by default; accept common Hepburn/Kunrei/Nihon-style alternatives.
+ // Long-vowel mark ー is displayed/typed as a hyphen. を stays wo (not o). ん always requires nn.
+ let paths=[current.romaji];
+ const variants=[
+  ["shi","si"],["chi","ti"],["tsu","tu"],["fu","hu"],["ji","zi"],["ji","di"],["zu","du"],
+  ["sha","sya"],["shu","syu"],["sho","syo"],["she","sye"],
+  ["cha","tya"],["chu","tyu"],["cho","tyo"],["che","tye"],
+  ["ja","jya"],["ja","zya"],["ju","jyu"],["ju","zyu"],["jo","jyo"],["jo","zyo"],
+  ["kya","kya"],["gya","gya"],["nya","nya"],["hya","hya"],["bya","bya"],["pya","pya"],["mya","mya"],["rya","rya"],
+  ["wi","whi"],["we","whe"],["wo","who"]
+ ];
+ // Generate alternate paths from the canonical prompt without changing unrelated letters.
+ for(const [canonical,alternate] of variants){
+  if(canonical===alternate)continue;
+  const snapshot=[...paths];
+  for(const original of snapshot){
+   if(original.includes(canonical)){
+    const chunks=original.split(canonical);let expanded=[""];
+    chunks.forEach((chunk,i)=>{expanded=expanded.map(prefix=>prefix+chunk);if(i<chunks.length-1)expanded=expanded.flatMap(prefix=>[prefix+canonical,prefix+alternate]);});
+    paths.push(...expanded);
+   }
+  }
+ }
+ return [...new Set(paths)];
+}
+function validNextKeys(){
+ const next=new Set();
+ for(const path of acceptedPaths()){
+  if(path.startsWith(typed) && typed.length<path.length) next.add(path[typed.length]);
+ }
+ return [...next];
+}
+function renderKeys(){
+ const root=document.getElementById("keyboard");root.innerHTML="";
+ const lit=waitingStart?["s"]:validNextKeys();
+ keyRows.forEach(row=>{
+  const wrap=document.createElement("div");wrap.className="key-row";
+  [...row].forEach(k=>{const b=document.createElement("div");b.className="key"+(lit.includes(k)?" lit":"");b.textContent=k;wrap.appendChild(b);});
+  root.appendChild(wrap);
+ });
+}
+function romanVariants(reading){
+ // A compact prototype matcher: common kana-to-romaji variants and mandatory nn for ん.
+ const map={"あ":["a"],"い":["i"],"う":["u"],"え":["e"],"お":["o"],"か":["ka"],"き":["ki"],"く":["ku"],"け":["ke"],"こ":["ko"],"さ":["sa"],"し":["shi","si"],"す":["su"],"せ":["se"],"そ":["so"],"た":["ta"],"ち":["chi","ti"],"つ":["tsu","tu"],"て":["te"],"と":["to"],"な":["na"],"に":["ni"],"ぬ":["nu"],"ね":["ne"],"の":["no"],"は":["ha"],"ひ":["hi"],"ふ":["fu","hu"],"へ":["he"],"ほ":["ho"],"ま":["ma"],"み":["mi"],"む":["mu"],"め":["me"],"も":["mo"],"や":["ya"],"ゆ":["yu"],"よ":["yo"],"ら":["ra"],"り":["ri"],"る":["ru"],"れ":["re"],"ろ":["ro"],"わ":["wa"],"を":["wo"],"ん":["nn"],"が":["ga"],"ぎ":["gi"],"ぐ":["gu"],"げ":["ge"],"ご":["go"],"ざ":["za"],"じ":["ji","zi"],"ず":["zu"],"ぜ":["ze"],"ぞ":["zo"],"だ":["da"],"ぢ":["di"],"づ":["du"],"で":["de"],"ど":["do"],"ば":["ba"],"び":["bi"],"ぶ":["bu"],"べ":["be"],"ぼ":["bo"],"ぱ":["pa"],"ぴ":["pi"],"ぷ":["pu"],"ぺ":["pe"],"ぽ":["po"],"きゃ":["kya"],"きゅ":["kyu"],"きょ":["kyo"],"しゃ":["sha","sya"],"しゅ":["shu","syu"],"しょ":["sho","syo"],"ちゃ":["cha","tya"],"ちゅ":["chu","tyu"],"ちょ":["cho","tyo"],"じゃ":["ja","jya","zya"],"じゅ":["ju","jyu","zyu"],"じょ":["jo","jyo","zyo"],"ー":["-"],"っ":[""]};
+ return map;
+}
+function endRound(cleared){
+ stopTimer();
+ const elapsedSeconds=Math.max(0.001,(performance.now()-roundStart)/1000);
+ const kpm=Math.round(totalChars/elapsedSeconds*60);
+ const accuracy=totalChars?Math.round(correctChars/totalChars*100):100;
+ const score=difficulty===0?0:Math.max(0,Math.floor(hp*kpm*(accuracy/100)*0.95));
+ const baseCoins=Math.floor(score/100);
+ const earned=difficulty===0?0:(difficulty===2?baseCoins*2:baseCoins);
+ roundScore=score; coins+=earned; best=Math.max(best,score);
+ document.getElementById("resultTitle").textContent=cleared?`ROUND ${round} クリア！`:`ROUND ${round} 終了`;
+ document.getElementById("resultScore").textContent=score.toLocaleString();
+ document.getElementById("earnedCoins").textContent=earned.toLocaleString();
+ document.getElementById("resultHp").textContent=`${hp} / ${maxHp}`;
+ document.getElementById("resultAverageKpm").textContent=`— → ${kpm.toLocaleString()}`;
+ document.getElementById("resultAccuracy").textContent=`— → ${accuracy}%`;
+ document.getElementById("resultWallet").textContent=coins.toLocaleString();
+ updateWallet(); resultSelection=0; show("result");if(cleared)playBloomSound("clear");
+}
+function restartFromBeginning(){round=1;startRound();}
+function resetBattle(){round=1;startRound();}
+function timeoutHit(){stopTimer();if(difficulty===0){nextEnemyAfterHit();return;}hp=Math.max(0,hp-(activeUpgrades.timeout?6:10));updateHP();document.getElementById("status").textContent="時間切れ！ HPが減った";if(hp<=0){endRound(false);return;}setTimeout(()=>{if(document.getElementById("battle").classList.contains("active")){if(waitingStart||started)return;nextEnemyAfterHit();}},450);}
+function nextEnemyAfterHit(){if(enemyIndex>=queue.length-1){endRound(false);return;}enemyIndex++;loadEnemy();waitingStart=false;startTimer();}
+function handleKey(e){
+ const key=e.key;
+ const home=document.getElementById("home").classList.contains("active");
+ const shop=document.getElementById("shop").classList.contains("active");
+ const inventoryScreen=document.getElementById("inventory").classList.contains("active");
+ const battle=document.getElementById("battle").classList.contains("active");
+ const result=document.getElementById("result").classList.contains("active");
+ if(home){
+  if(key==="Shift"){e.preventDefault();toggleDifficultyPanel();return;}
+  if(difficultyOpen){
+   if(key==="Escape"){e.preventDefault();draftDifficulty=difficulty;difficultyOpen=false;renderHomeModes();return;}
+   if(key==="ArrowLeft"||key==="ArrowUp"){e.preventDefault();moveDraftDifficulty(draftDifficulty-1);return;}
+   if(key==="ArrowRight"||key==="ArrowDown"){e.preventDefault();moveDraftDifficulty(draftDifficulty+1);return;}
+   if(key==="Enter"){e.preventDefault();difficulty=draftDifficulty;difficultyOpen=false;renderHomeModes();return;}
+   return;
+  }
+  if(key==="ArrowLeft"){e.preventDefault();selectHomeMode(homeMode-1);return;}
+  if(key==="ArrowRight"){e.preventDefault();selectHomeMode(homeMode+1);return;}
+  if(key==="Enter"){e.preventDefault();activateHomeMode();return;}
+ }
+ if(shop||inventoryScreen){
+  if(key==="Backspace"||key.toLowerCase()==="h"){e.preventDefault();goHome();return;}
+  const gridId=shop?"shopGrid":"inventoryGrid";
+  if(key==="ArrowLeft"||key==="ArrowUp"){e.preventDefault();moveCardSelection(gridId,-1);return;}
+  if(key==="ArrowRight"||key==="ArrowDown"){e.preventDefault();moveCardSelection(gridId,1);return;}
+  if(key==="Enter"){e.preventDefault();activateSelectedCard(gridId);return;}
+  return;
+ }
+ if(result){
+  if(key==="ArrowLeft"||key==="ArrowUp"){e.preventDefault();moveResultSelection(-1);return;}
+  if(key==="ArrowRight"||key==="ArrowDown"){e.preventDefault();moveResultSelection(1);return;}
+  if(key==="Enter"){e.preventDefault();activateResultSelection();return;}
+  if(key==="Backspace"||key.toLowerCase()==="h"){e.preventDefault();goHome();return;}
+  return;
+ }
+ if(battle&&key==="Backspace"){
+  e.preventDefault();goHome();return;
+ }
+ // Escape restarts the current run at the S-to-start screen.
+ const commandGreater=e.metaKey&&(key===">"||(e.shiftKey&&e.code==="Period"));
+ if(key==="Escape"||commandGreater){e.preventDefault();resetBattle();return;}
+ if(e.ctrlKey||e.metaKey||e.altKey)return;
+ if(!battle)return;
+ if(waitingStart){if(key.toLowerCase()==="s"){e.preventDefault();beginBattle();}return;}
+ if(!started)return;
+ if(key.length!==1||!/^[a-z-]$/i.test(key))return;
+ const typedKey=key.toLowerCase();e.preventDefault();
+ totalChars++;
+ const candidate=typed+typedKey;
+ const paths=acceptedPaths();
+ if(paths.some(path=>path.startsWith(candidate))){
+  playBloomSound("type");typed=candidate;correctChars++;renderRomaji();renderKeys();
+  if(paths.includes(typed)){
+   stopTimer();
+   if(enemyIndex===queue.length-1){document.getElementById("status").textContent="クリア！";endRound(true);}
+   else{enemyIndex++;loadEnemy();startTimer();document.getElementById("status").textContent="次の問題！";}
+  }
+ }else{
+  playBloomSound("mistype");mistakes++;if(difficulty!==0)hp=Math.max(0,hp-(activeUpgrades.typo?3:5));updateHP();
+  document.getElementById("status").textContent="ミス！ HPが減った";
+  if(hp<=0){endRound(false);return;}
+ }
+ updateLiveStats();
+}
+document.addEventListener("keydown",handleKey);
+updateWallet();renderShop();renderHomeModes();renderResultSelection();
+</script>
+</body>
+</html>
