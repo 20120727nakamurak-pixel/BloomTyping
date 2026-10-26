@@ -15,7 +15,7 @@ body{margin:0;min-height:100vh;background:
  radial-gradient(ellipse at 50% 0%,#17375a 0%,transparent 55%),
  linear-gradient(150deg,#071326,#0a1b30 65%,#102a48);
  color:var(--text);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}
-button{font:inherit;cursor:default;pointer-events:none;user-select:none}
+button{font:inherit;cursor:pointer;user-select:none}
 .app{max-width:1080px;margin:auto;padding:20px}
 .topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;color:var(--muted);font-size:14px;margin-bottom:18px}
 .brand{font-weight:800;letter-spacing:.08em;color:#f2f7ff}
@@ -500,30 +500,41 @@ function renderRomaji(){
  el.innerHTML=[...target].map((c,i)=>`<span class="${i<typed.length?'done':i===typed.length?'next':'rest'}">${c}</span>`).join("");
 }
 function acceptedPaths(){
- // Canonical spelling is shown by default; accept common Hepburn/Kunrei/Nihon-style alternatives.
- // Long-vowel mark ー is displayed/typed as a hyphen. を stays wo (not o). ん always requires nn.
- let paths=[current.romaji];
+ // 表示されているローマ字がどの表記でも、一般的な別表記を入力候補にする。
+ // 「ん」は nn のみ。長音「ー」は - で入力する。
  const variants=[
   ["shi","si"],["chi","ti"],["tsu","tu"],["fu","hu"],["ji","zi"],["ji","di"],["zu","du"],
   ["sha","sya"],["shu","syu"],["sho","syo"],["she","sye"],
   ["cha","tya"],["chu","tyu"],["cho","tyo"],["che","tye"],
   ["ja","jya"],["ja","zya"],["ju","jyu"],["ju","zyu"],["jo","jyo"],["jo","zyo"],
-  ["kya","kya"],["gya","gya"],["nya","nya"],["hya","hya"],["bya","bya"],["pya","pya"],["mya","mya"],["rya","rya"],
   ["wi","whi"],["we","whe"],["wo","who"]
  ];
- // Generate alternate paths from the canonical prompt without changing unrelated letters.
- for(const [canonical,alternate] of variants){
-  if(canonical===alternate)continue;
+ let paths=new Set([current.romaji]);
+ const MAX_PATHS=4096;
+ // ペアを両方向に展開し、複数箇所の別表記にも対応する。
+ for(const [a,b] of variants){
   const snapshot=[...paths];
-  for(const original of snapshot){
-   if(original.includes(canonical)){
-    const chunks=original.split(canonical);let expanded=[""];
-    chunks.forEach((chunk,i)=>{expanded=expanded.map(prefix=>prefix+chunk);if(i<chunks.length-1)expanded=expanded.flatMap(prefix=>[prefix+canonical,prefix+alternate]);});
-    paths.push(...expanded);
+  const additions=[];
+  for(const path of snapshot){
+   for(const [from,to] of [[a,b],[b,a]]){
+    let start=0;
+    while(true){
+     const index=path.indexOf(from,start);
+     if(index===-1)break;
+     additions.push(path.slice(0,index)+to+path.slice(index+from.length));
+     start=index+1;
+     if(additions.length>=MAX_PATHS)break;
+    }
+    if(additions.length>=MAX_PATHS)break;
    }
+   if(additions.length>=MAX_PATHS)break;
+  }
+  for(const path of additions){
+   paths.add(path);
+   if(paths.size>=MAX_PATHS)break;
   }
  }
- return [...new Set(paths)];
+ return [...paths];
 }
 function validNextKeys(){
  const next=new Set();
