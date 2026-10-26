@@ -94,8 +94,8 @@ button{font:inherit;cursor:default;pointer-events:none;user-select:none}
   <section id="home" class="screen active">
     <div class="home">
       <div class="home-stats">
-        <div class="pill">🪙 所持コイン <strong id="homeCoins">0</strong></div>
-        <div class="pill">最高スコア <strong id="homeBest">0</strong></div>
+        <div class="pill">所持コイン： <strong id="homeCoins">0</strong></div>
+        <div class="pill">最高スコア： <strong id="homeBest">0</strong></div>
       </div>
       <div class="home-title">Bloom Typing</div>
       <div class="tagline">タイピングで、花が咲く。</div>
@@ -169,7 +169,7 @@ button{font:inherit;cursor:default;pointer-events:none;user-select:none}
   <section id="inventory" class="screen">
     <div class="page-head"><div><h2>持ち物</h2><div class="note">装備したアイテムは、次のRound開始時に1回分消費して効果を発揮する。</div></div><div class="pill">所持品</div></div>
     <div class="shop-grid" id="inventoryGrid"></div>
-    <div class="toast" id="inventoryToast"></div><div class="note" style="text-align:center">← / →：アイテム選択　Enter：装備切替　Backspace または H：ホームへ</div>
+    <div class="toast" id="inventoryToast"></div><div class="note" style="text-align:center">← / →：アイテム選択　Enter：装備切替　Backspace：ホームへ</div>
     <div class="note" style="text-align:center">Backspace　でホームに戻る</div><div class="controls"><button class="secondary" onclick="goHome()">ホームへ戻る（Backspace）</button></div>
   </section>
 
@@ -191,10 +191,11 @@ button{font:inherit;cursor:default;pointer-events:none;user-select:none}
 // Each Round samples ten distinct prompts from the full pool so newly added text can appear immediately.
 const prompts = [
   {reading:"ひまですね", text:"暇ですね", romaji:"himadesune"},
+  {reading:"かのうせいをはいりょしたかがくじっけんにいどむ", text:"可能性を配慮した科学実験に挑む", romaji:"kanouseiwohairyositakagakuzikkennniidomu"},
   {reading:"いいてんき", text:"良い天気", romaji:"iitennki"},
   {reading:"じゃんぷ", text:"ジャンプ", romaji:"jannpu"},
-  {reading:"ねむいからすぐふとんにはいりました", text:"眠いからすぐ布団に入りました", romaji:"nemuikarasugufutonnnihairimashita"},
-  {reading:"しょうりんじけんぽう", text:"少林寺拳法", romaji:"shourinnjikennpou"},
+  {reading:"ねむいからすぐふとんにはいりました", text:"眠いからすぐ布団に入りました", romaji:"nemuikarasuguhutonnnihairimashita"},
+  {reading:"しょうりんじけんぽう", text:"少林寺拳法", romaji:"shourinnzikennpou"},
   {reading:"びょうどういんほうおうどう", text:"平等院鳳凰堂", romaji:"byoudouinnhououdou"},
   {reading:"おはようございます", text:"おはようございます", romaji:"ohayougozaimasu"},
   {reading:"ありがとう", text:"ありがとう", romaji:"arigatou"},
@@ -202,8 +203,8 @@ const prompts = [
   {reading:"みずをのみます", text:"水を飲みます", romaji:"mizuwonomimasu"},
   {reading:"ねこがねています", text:"猫が寝ています", romaji:"nekoganeteimasu"},
   {reading:"いぬとさんぽ", text:"犬と散歩", romaji:"inutosannpo"},
-  {reading:"あめがふっています", text:"雨が降っています", romaji:"amegafutteimasu"},
-  {reading:"ほんをよみます", text:"本を読みます", romaji:"honnwoyomimasu"},
+  {reading:"あめがふっています", text:"雨が降っています", romaji:"amegahutteimasu"},
+  {reading:"ほんをよむ", text:"本を読む", romaji:"honnwoyomu"},
   {reading:"でんしゃにのります", text:"電車に乗ります", romaji:"dennshaninorimasu"},
   {reading:"えきまであるきます", text:"駅まで歩きます", romaji:"ekimadearukimasu"},
   {reading:"きょうはさむいです", text:"今日は寒いです", romaji:"kyouhasamuidesu"},
@@ -212,65 +213,65 @@ const prompts = [
   {reading:"たまごやきをつくる", text:"卵焼きを作る", romaji:"tamagoyakiwotsukuru"},
   {reading:"こうえんであそぶ", text:"公園で遊ぶ", romaji:"kouenndeasobu"},
   {reading:"ともだちとべんきょう", text:"友達と勉強", romaji:"tomodachitobennkyou"},
-  {reading:"まいにちれんしゅう", text:"毎日練習", romaji:"mainichirennshuu"},
-  {reading:"しゅくだいがおわりました", text:"宿題が終わりました", romaji:"shukudaigaowarimashita"},
+  {reading:"まいにちれんしゅう", text:"毎日練習", romaji:"mainitirennshuu"},
+  {reading:"しゅくだいがおわらない", text:"宿題が終わらない", romaji:"shukudaigaowaranai"},
   {reading:"きゅうけいしましょう", text:"休憩しましょう", romaji:"kyuukeishimashou"},
-  {reading:"ちいさなはな", text:"小さな花", romaji:"chiisanahana"},
+  {reading:"ちいさなはな", text:"小さな花", romaji:"tiisanahana"},
   {reading:"しゃしんをとります", text:"写真を撮ります", romaji:"shashinnwotorimasu"},
-  {reading:"じかんをまもろう", text:"時間を守ろう", romaji:"jikannwomamorou"},
+  {reading:"じかんをまもろう", text:"時間を守ろう", romaji:"zikannwomamorou"},
   {reading:"ゆうびんきょく", text:"郵便局", romaji:"yuubinnkyoku"},
   {reading:"せかいりょこう", text:"世界旅行", romaji:"sekairyokou"},
-  {reading:"うちゅうのほし", text:"宇宙の星", romaji:"uchuunohoshi"},
+  {reading:"うちゅうのほし", text:"宇宙の星", romaji:"utyuunohoshi"},
   {reading:"たいせつなやくそく", text:"大切な約束", romaji:"taisetsunayakusoku"},
   {reading:"まどをあけてください", text:"窓を開けてください", romaji:"madowoaketekudasai"},
-  {reading:"あたらしいことにちょうせん", text:"新しいことに挑戦", romaji:"atarashiikotonichousenn"},
+  {reading:"あたらしいことにちょうせん", text:"新しいことに挑戦", romaji:"atarashiikotonityousenn"},
   {reading:"らいしゅうはりょこうです", text:"来週は旅行です", romaji:"raishuuharyokoudesu"},
   {reading:"まけずにがんばろう", text:"負けずに頑張ろう", romaji:"makezunigannbarou"},
-  {reading:"みんなでちからをあわせる", text:"みんなで力を合わせる", romaji:"minnnadechikarawoawaseru"},
+  {reading:"みんなでちからをあわせる", text:"みんなで力を合わせる", romaji:"minnnadetikarawoawaseru"},
   {reading:"あさはやくおきる", text:"朝早く起きる", romaji:"asahayakuokiru"},
   {reading:"よるははやくねよう", text:"夜は早く寝よう", romaji:"yoruhahayakuneyou"},
-  {reading:"まいにちみずをのむ", text:"毎日水を飲む", romaji:"mainichimizuwonomu"},
+  {reading:"まいにちみずをのむ", text:"毎日水を飲む", romaji:"mainitimizuwonomu"},
   {reading:"あきのそらはたかい", text:"秋の空は高い", romaji:"akinosorahatakai"},
   {reading:"はるになるとはながさく", text:"春になると花が咲く", romaji:"haruninarutohanagasaku"},
-  {reading:"なつやすみがたのしみ", text:"夏休みが楽しみ", romaji:"natsuyasumigatanoshimi"},
-  {reading:"ふゆはあたたかいふく", text:"冬は暖かい服", romaji:"fuyuhaatatakaifuku"},
-  {reading:"かぜがつよくふいている", text:"風が強く吹いている", romaji:"kazegatsuyokufuiteiru"},
+  {reading:"なつやすみがたのしみ", text:"夏休みが楽しみ", romaji:"natuyasumigatanoshimi"},
+  {reading:"ふゆはあたたかいふく", text:"冬は暖かい服", romaji:"huyuhaatatakaihuku"},
+  {reading:"かぜがつよくふいている", text:"風が強く吹いている", romaji:"kazegatuyokuhuiteiru"},
   {reading:"そらににじがかかった", text:"空に虹がかかった", romaji:"soraninijigakakatta"},
   {reading:"ほしがきれいにみえる", text:"星がきれいに見える", romaji:"hoshigakireinimieru"},
   {reading:"うみのむこうへいこう", text:"海の向こうへ行こう", romaji:"uminomukouheikou"},
   {reading:"やまのてんきはかわりやすい", text:"山の天気は変わりやすい", romaji:"yamanotennkihakawariyasui"},
   {reading:"かわのそばをあるく", text:"川のそばを歩く", romaji:"kawanosobawoaruku"},
   {reading:"もりのなかでやすむ", text:"森の中で休む", romaji:"morinonakadeyasumu"},
-  {reading:"ちずをみてみちをさがす", text:"地図を見て道を探す", romaji:"chizuwomitemichiwosagasu"},
-  {reading:"えんぴつでなまえをかく", text:"鉛筆で名前を書く", romaji:"ennpitsudenamaewokaku"},
+  {reading:"ちずをみてみちをさがす", text:"地図を見て道を探す", romaji:"tizuwomitemitiwosagasu"},
+  {reading:"えんぴつでなまえをかく", text:"鉛筆で名前を書く", romaji:"ennpitudenamaewokaku"},
   {reading:"じしょでことばをしらべる", text:"辞書で言葉を調べる", romaji:"jishodekotobawoshiraberu"},
   {reading:"ほんだなをせいりする", text:"本棚を整理する", romaji:"honndanawoseirisuru"},
   {reading:"まどのそとをながめる", text:"窓の外を眺める", romaji:"madonosotowonagameru"},
   {reading:"へやをきれいにそうじする", text:"部屋をきれいに掃除する", romaji:"heyawokireinisoujisuru"},
-  {reading:"あたらしいくつをかった", text:"新しい靴を買った", romaji:"atarashiikutsuwokatta"},
+  {reading:"あたらしいくつをかった", text:"新しい靴を買った", romaji:"atarashiikutuwokatta"},
   {reading:"かさをわすれないでね", text:"傘を忘れないでね", romaji:"kasawowasurenaidene"},
   {reading:"おなかがすいてきた", text:"お腹が空いてきた", romaji:"onakagasuitekita"},
-  {reading:"あたたかいおちゃをのむ", text:"温かいお茶を飲む", romaji:"atatakaiochawonomu"},
+  {reading:"あたたかいおちゃをのむ", text:"温かいお茶を飲む", romaji:"atatakaiotyawonomu"},
   {reading:"やさいをたくさんたべよう", text:"野菜をたくさん食べよう", romaji:"yasaiwotakusanntabeyou"},
   {reading:"きょうのよるごはんはかれー", text:"今日の夜ご飯はカレー", romaji:"kyounoyorugohannhakare-"},
-  {reading:"あまいものはべつばら", text:"甘いものは別腹", romaji:"amaimonohabetsubara"},
-  {reading:"りょうりはあいじょうがたいせつ", text:"料理は愛情が大切", romaji:"ryourihaaijougataisetsu"},
+  {reading:"あまいものはべつばら", text:"甘いものは別腹", romaji:"amaimonohabetubara"},
+  {reading:"りょうりはあいじょうがたいせつ", text:"料理は愛情が大切", romaji:"ryourihaaijougataisetu"},
   {reading:"たまにはゆっくりやすもう", text:"たまにはゆっくり休もう", romaji:"tamanihayukkuriyasumou"},
   {reading:"からだをうごかしてきぶんてんかん", text:"体を動かして気分転換", romaji:"karadawougokashitekibunntennkann"},
   {reading:"じかんにゆとりをもとう", text:"時間にゆとりを持とう", romaji:"jikannniyutoriwomotou"},
-  {reading:"ちいさなことからはじめよう", text:"小さなことから始めよう", romaji:"chiisanakotokarahajimeyou"},
-  {reading:"まちがいはせいちょうのたね", text:"間違いは成長の種", romaji:"machigaihaseichounotane"},
+  {reading:"ちいさなことからはじめよう", text:"小さなことから始めよう", romaji:"tiisanakotokarahajimeyou"},
+  {reading:"まちがいはせいちょうのたね", text:"間違いは成長の種", romaji:"matigaihaseityounotane"},
   {reading:"なんどでもちょうせんしよう", text:"何度でも挑戦しよう", romaji:"nanndodemochousennshiyou"},
-  {reading:"あきらめずにつづけよう", text:"あきらめずに続けよう", romaji:"akiramezunitsudukeyou"},
-  {reading:"できることからすこしずつ", text:"できることから少しずつ", romaji:"dekirukotokarasukoshizutsu"},
+  {reading:"あきらめずにつづけよう", text:"あきらめずに続けよう", romaji:"akiramezunitudukeyou"},
+  {reading:"できることからすこしずつ", text:"できることから少しずつ", romaji:"dekirukotokarasukoshizutu"},
   {reading:"まえをむいてあるこう", text:"前を向いて歩こう", romaji:"maewomuitearukou"},
   {reading:"えがおはまわりをあかるくする", text:"笑顔は周りを明るくする", romaji:"egaohamawariwoakarukusuru"},
-  {reading:"ことばにはちからがある", text:"言葉には力がある", romaji:"kotobanihachikaragaaru"},
-  {reading:"こころをこめてつたえよう", text:"心を込めて伝えよう", romaji:"kokorowokometetsutaeyou"},
+  {reading:"ことばにはちからがある", text:"言葉には力がある", romaji:"kotobanihatikaragaaru"},
+  {reading:"こころをこめてつたえよう", text:"心を込めて伝えよう", romaji:"kokorowokometetutaeyou"},
   {reading:"いしのうえにもさんねん", text:"石の上にも三年", romaji:"ishinouenimosannnenn"},
   {reading:"いそがばまわれ", text:"急がば回れ", romaji:"isogabamaware"},
-  {reading:"さるもきからおちる", text:"猿も木から落ちる", romaji:"sarumokikaraochiru"},
-  {reading:"ちりもつもればやまとなる", text:"塵も積もれば山となる", romaji:"chirimotsumorebayamatonaru"},
+  {reading:"さるもきからおちる", text:"猿も木から落ちる", romaji:"sarumokikaraotiru"},
+  {reading:"ちりもつもればやまとなる", text:"塵も積もれば山となる", romaji:"tirimotsumorebayamatonaru"},
   {reading:"わらうかどにはふくきたる", text:"笑う門には福来る", romaji:"waraukadonihafukukitaru"},
   {reading:"ななころびやおき", text:"七転び八起き", romaji:"nanakorobiyaoki"},
   {reading:"はやおきはさんもんのとく", text:"早起きは三文の得", romaji:"hayaokihasannmonnnotoku"},
@@ -280,64 +281,64 @@ const prompts = [
   {reading:"ねこにこばん", text:"猫に小判", romaji:"nekonikobann"},
   {reading:"ぶたにしんじゅ", text:"豚に真珠", romaji:"butanishinnju"},
   {reading:"いぬもあるけばぼうにあたる", text:"犬も歩けば棒に当たる", romaji:"inumoarukebabouniataru"},
-  {reading:"あとのまつり", text:"後の祭り", romaji:"atonomatsuri"},
+  {reading:"あとのまつり", text:"後の祭り", romaji:"atonomaturi"},
   {reading:"あたまかくしてしりかくさず", text:"頭隠して尻隠さず", romaji:"atamakakushiteshirikakusazu"},
   {reading:"はなよりだんご", text:"花より団子", romaji:"hanayoridanngo"},
   {reading:"おににかなぼう", text:"鬼に金棒", romaji:"oninikanabou"},
   {reading:"みからでたさび", text:"身から出た錆", romaji:"mikaradetasabi"},
-  {reading:"ひとのふりみてわがふりなおせ", text:"人の振り見て我が振り直せ", romaji:"hitonofurimitewagafurinaose"},
-  {reading:"たなからぼたもち", text:"棚からぼた餅", romaji:"tanakarabotamochi"},
+  {reading:"ひとのふりみてわがふりなおせ", text:"人の振り見て我が振り直せ", romaji:"hitonohurimitewagahurinaose"},
+  {reading:"たなからぼたもち", text:"棚からぼた餅", romaji:"tanakarabotamoti"},
   {reading:"かめのこうよりとしのこう", text:"亀の甲より年の功", romaji:"kamenokouyoritoshinokou"},
-  {reading:"いっせきにちょう", text:"一石二鳥", romaji:"issekinichou"},
-  {reading:"いちごいちえ", text:"一期一会", romaji:"ichigoichie"},
-  {reading:"しんしゅつきぼつ", text:"神出鬼没", romaji:"shinnshutsukibotsu"},
-  {reading:"いっきいちゆう", text:"一喜一憂", romaji:"ikkiichiyuu"},
+  {reading:"いっせきにちょう", text:"一石二鳥", romaji:"issekinityou"},
+  {reading:"いちごいちえ", text:"一期一会", romaji:"itigoitie"},
+  {reading:"しんしゅつきぼつ", text:"神出鬼没", romaji:"shinnshutukibotu"},
+  {reading:"いっきいちゆう", text:"一喜一憂", romaji:"ikkiitiyuu"},
   {reading:"じがじさん", text:"自画自賛", romaji:"jigajisann"},
-  {reading:"ききいっぱつ", text:"危機一髪", romaji:"kikiippatsu"},
+  {reading:"ききいっぱつ", text:"危機一髪", romaji:"kikiippatu"},
   {reading:"しこうさくご", text:"試行錯誤", romaji:"shikousakugo"},
   {reading:"ぜんりょくとうきゅう", text:"全力投球", romaji:"zennryokutoukyuu"},
-  {reading:"いみしんちょう", text:"意味深長", romaji:"imishinnchou"},
+  {reading:"いみしん", text:"意味深", romaji:"imishinn"},
   {reading:"しんらばんしょう", text:"森羅万象", romaji:"shinnrabannshou"},
-  {reading:"ゆうおうまいしん", text:"勇往邁進", romaji:"yuuoumaishinn"},
   {reading:"きょうみしんしん", text:"興味津々", romaji:"kyoumishinnshinn"},
-  {reading:"あんぜんだいいち", text:"安全第一", romaji:"annzenndaiichi"},
-  {reading:"いちねんのけいはがんたんにあり", text:"一年の計は元旦にあり", romaji:"ichinennnokeihaganntannniari"},
+  {reading:"あんぜんだいいち", text:"安全第一", romaji:"annzenndaiiti"},
+  {reading:"いちねんのけいはがんたんにあり", text:"一年の計は元旦にあり", romaji:"itinennnokeihaganntannniari"},
   {reading:"てんさいはどりょくのたまもの", text:"天才は努力の賜物", romaji:"tennsaihadoryokunotamamono"},
   {reading:"こういんやのごとし", text:"光陰矢の如し", romaji:"kouinnyanogotoshi"},
   {reading:"しっぱいはせいこうのもと", text:"失敗は成功のもと", romaji:"shippaihaseikounomoto"},
   {reading:"ひゃくぶんはいっけんにしかず", text:"百聞は一見にしかず", romaji:"hyakubunnhaikkennnishikazu"},
-  {reading:"いちにちいっぽ", text:"一日一歩", romaji:"ichinichiippo"},
-  {reading:"きゅうそくもたいせつ", text:"休息も大切", romaji:"kyuusokumotaisetsu"},
-  {reading:"みんなでちからをあわせよう", text:"みんなで力を合わせよう", romaji:"minnnadechikarawoawaseyou"},
+  {reading:"いちにちいっぽ", text:"一日一歩", romaji:"itinitiippo"},
+  {reading:"きゅうそくもたいせつ", text:"休息も大切", romaji:"kyuusokumotaisetu"},
+  {reading:"みんなでちからをあわせよう", text:"みんなで力を合わせよう", romaji:"minnnadetikarawoawaseyou"},
   {reading:"あんしんしてまかせて", text:"安心して任せて", romaji:"annshinnshitemakasete"},
   {reading:"でんきをけしてねよう", text:"電気を消して寝よう", romaji:"dennkiwokeshiteneyou"},
   {reading:"きょうはなんようびですか", text:"今日は何曜日ですか", romaji:"kyouhanannyoubidesuka"},
-  {reading:"えきでともだちとまちあわせ", text:"駅で友達と待ち合わせ", romaji:"ekidetomodachitomachiawase"},
+  {reading:"えきでともだちとまちあわせ", text:"駅で友達と待ち合わせ", romaji:"ekidetomodatitomatiawase"},
   {reading:"こうさてんではとまろう", text:"交差点では止まろう", romaji:"kousatenndehatomarou"},
-  {reading:"みちをゆずるやさしさ", text:"道を譲る優しさ", romaji:"michiwoyuzuruyasashisa"},
-  {reading:"きそくただしいせいかつ", text:"規則正しい生活", romaji:"kisokutadashiiseikatsu"},
-  {reading:"まいにちこつこつがんばる", text:"毎日こつこつ頑張る", romaji:"mainichikotsukotsugannbaru"},
+  {reading:"みちをゆずるやさしさ", text:"道を譲る優しさ", romaji:"mitiwoyuzuruyasashisa"},
+  {reading:"きそくただしいせいかつ", text:"規則正しい生活", romaji:"kisokutadashiiseikatu"},
+  {reading:"まいにちこつこつがんばる", text:"毎日こつこつ頑張る", romaji:"mainitikotukotugannbaru"},
   {reading:"ゆめにむかってすすもう", text:"夢に向かって進もう", romaji:"yumenimukattesusumou"},
   {reading:"あしたのじぶんにできること", text:"明日の自分にできること", romaji:"ashitanojibunnnidekirukoto"},
   {reading:"おたがいにたすけあおう", text:"お互いに助け合おう", romaji:"otagainitasukeaou"},
-  {reading:"ひとやすみしてからつづけよう", text:"一休みしてから続けよう", romaji:"hitoyasumishitekaratsudukeyou"},
-  {reading:"しずかなところでしゅうちゅうする", text:"静かなところで集中する", romaji:"shizukanatokorodeshuuchuusuru"},
+  {reading:"ひとやすみしてからつづけよう", text:"一休みしてから続けよう", romaji:"hitoyasumishitekaratudukeyou"},
+  {reading:"しずかなところでしゅうちゅうする", text:"静かなところで集中する", romaji:"shizukanatokorodeshuutyuusuru"},
   {reading:"あんぜんにきをつけよう", text:"安全に気をつけよう", romaji:"annzennnikiwotsukeyou"},
   {reading:"ひろいせかいをみてみたい", text:"広い世界を見てみたい", romaji:"hiroisekaiwomitemitai"},
-  {reading:"ことばをたいせつにしよう", text:"言葉を大切にしよう", romaji:"kotobawotaisetsunishiyou"},
-  {reading:"きょうもいちにちおつかれさま", text:"今日も一日お疲れさま", romaji:"kyoumoichinichiotsukaresama"},
-  {reading:"あんこはつぶあんはこしあんは", text:"あんこは粒あん派？こしあん派？", romaji:"annkohatsubuannhakoshiannha"},
-  {reading:"ちょうせつはむずかしい", text:"調節は難しい", romaji:"chousetsuhamuzukashii"},
+  {reading:"ことばをたいせつにしよう", text:"言葉を大切にしよう", romaji:"kotobawotaisetunishiyou"},
+  {reading:"きょうもいちにちおつかれさま", text:"今日も一日お疲れさま", romaji:"kyoumoitinitiotukaresama"},
+  {reading:"あんこはつぶあんはこしあんは", text:"あんこは粒あん派？こしあん派？", romaji:"annkohatubuannhakoshiannha"},
+  {reading:"ちょうせつはむずかしい", text:"調節は難しい", romaji:"tyousetuhamuzukashii"},
   {reading:"おんがくをききながらべんきょう", text:"音楽を聴きながら勉強", romaji:"onngakuwokikinagarabennkyou"},
   {reading:"まんてんのほしぞら", text:"満点の星空", romaji:"manntennnohoshizora"},
-  {reading:"でんせつのけんじゃ", text:"伝説の賢者", romaji:"dennsetsunokennja"},
+  {reading:"でんせつのけんじゃ", text:"伝説の賢者", romaji:"dennsetunokennja"},
   {reading:"むりせずじぶんのぺーすで", text:"無理せず自分のペースで", romaji:"murisezujibunnnope-sude"},
+  {reading:"くろよりくろくやみよりくらきしっこくにわがしんくのこんこうをのぞみたもうかくせいのとききたれりむびゅうのきょうかいにおちしことわりむじょうのゆがみとなりてげんしゅつせよ", text:"黒より黒く闇より暗き漆黒に我が深紅の混淆を望みたもう覚醒の時来たれり無謬の境界に落ちし理無常の歪みとなりて現出せよ", romaji:"kuroyorikurokuyamiyorikurakishikkokuniwagashinnkunokonnkouwonozomitamoukakuseinotokikitarerimubyuunokyoukainiotishikotowarimujounoyugamitonaritegennshutuseyo"},
 ];
 const keyRows = ["qwertyuiop","asdfghjkl","zxcvbnm"];
 const upgrades = [
  {id:"typo",icon:"⬡",name:"ミス耐性",desc:"ミス時のダメージを軽減します。",price:500,effect:"ミスダメージ 5 → 3"},
  {id:"timeout",icon:"⌛",name:"時間切れ耐性",desc:"時間切れ時のダメージを軽減します。",price:500,effect:"時間切れダメージ 10 → 6"},
- {id:"time",icon:"◷",name:"時間延長",desc:"各問題の制限時間を延長します。",price:800,effect:"制限時間 ＋5秒"}
+ {id:"time",icon:"◷",name:"時間延長",desc:"各問題の制限時間を延長します。",price:500,effect:"制限時間 ＋5秒"}
 ];
 let coins=0,best=0,round=1,hp=100,maxHp=100,enemyIndex=0,queue=[],current=null,elapsed=0,limit=0,tick=null,typed="",mistakes=0,totalChars=0,correctChars=0,roundStart=0,battleStartedAt=0,activeUpgrades={typo:false,timeout:false,time:false},roundScore=0,lastResultKpm=null,lastResultAccuracy=null;
 let resultSelection=0;
@@ -386,7 +387,7 @@ function renderHomeModes(){
  const ids=["modeShop","modeBattle","modeInventory"];
  ids.forEach((id,i)=>document.getElementById(id).classList.toggle("selected",i===homeMode));
  const names=["お店","スタート","持ち物"];
- document.getElementById("homeModeHint").textContent= difficultyOpen ? "← ↑ ↓ → で難易度を選択 · Enterで確定 · Escでキャンセル" : "← → で「お店 ← スタート → 持ち物」を選択 · Enterで決定 · Shiftで難易度変更";
+ document.getElementById("homeModeHint").textContent= difficultyOpen ? "← → で難易度を選択 · Enterで確定 · Escでキャンセル" : "← → で「お店 ← スタート → 持ち物」を選択 · Enterで決定 · Shiftで難易度変更";
  document.getElementById("currentDifficultyLabel").textContent=["Seed Mode","Bud Mode","Bloom Mode"][difficulty];
  ["difficultySeed","difficultyBud","difficultyBloom"].forEach((id,i)=>document.getElementById(id).classList.toggle("selected",i===(difficultyOpen?draftDifficulty:difficulty)));
  document.getElementById("difficultyPanel").style.display=difficultyOpen?"block":"none";
@@ -421,8 +422,8 @@ function renderInventory(){
   const card=document.createElement("div");card.className="upgrade-card";
   card.innerHTML=`<div class="upgrade-icon">${u.icon}</div><h3>${u.name}</h3><p>${u.desc}<br><span class="note">${u.effect}</span></p><div class="note">所持数：${count}個</div><div class="note">${isEquipped?"装備中":"未装備"}</div><button class="${isEquipped?"secondary":"primary"}" ${(!isEquipped&&count<1)?"disabled":""}>${isEquipped?"装備を外す":count<1?"在庫なし":"装備する"}</button>`;
   card.querySelector("button").onclick=()=>{
-   if(equipped[u.id]){equipped[u.id]=false;document.getElementById("inventoryToast").textContent=u.name+"の装備を外したよ。";}
-   else if(inventory[u.id]>0){equipped[u.id]=true;document.getElementById("inventoryToast").textContent=u.name+"を装備したよ！次のRound開始時に使われるよ。";}
+   if(equipped[u.id]){equipped[u.id]=false;document.getElementById("inventoryToast").textContent=u.name+"の装備を外した。";}
+   else if(inventory[u.id]>0){equipped[u.id]=true;document.getElementById("inventoryToast").textContent=u.name+"を装備した、次のRound開始時に使用される。";}
    renderInventory();
   };
   grid.appendChild(card);
@@ -542,7 +543,7 @@ function renderKeys(){
 }
 function romanVariants(reading){
  // A compact prototype matcher: common kana-to-romaji variants and mandatory nn for ん.
- const map={"あ":["a"],"い":["i"],"う":["u"],"え":["e"],"お":["o"],"か":["ka"],"き":["ki"],"く":["ku"],"け":["ke"],"こ":["ko"],"さ":["sa"],"し":["shi","si"],"す":["su"],"せ":["se"],"そ":["so"],"た":["ta"],"ち":["chi","ti"],"つ":["tsu","tu"],"て":["te"],"と":["to"],"な":["na"],"に":["ni"],"ぬ":["nu"],"ね":["ne"],"の":["no"],"は":["ha"],"ひ":["hi"],"ふ":["fu","hu"],"へ":["he"],"ほ":["ho"],"ま":["ma"],"み":["mi"],"む":["mu"],"め":["me"],"も":["mo"],"や":["ya"],"ゆ":["yu"],"よ":["yo"],"ら":["ra"],"り":["ri"],"る":["ru"],"れ":["re"],"ろ":["ro"],"わ":["wa"],"を":["wo"],"ん":["nn"],"が":["ga"],"ぎ":["gi"],"ぐ":["gu"],"げ":["ge"],"ご":["go"],"ざ":["za"],"じ":["ji","zi"],"ず":["zu"],"ぜ":["ze"],"ぞ":["zo"],"だ":["da"],"ぢ":["di"],"づ":["du"],"で":["de"],"ど":["do"],"ば":["ba"],"び":["bi"],"ぶ":["bu"],"べ":["be"],"ぼ":["bo"],"ぱ":["pa"],"ぴ":["pi"],"ぷ":["pu"],"ぺ":["pe"],"ぽ":["po"],"きゃ":["kya"],"きゅ":["kyu"],"きょ":["kyo"],"しゃ":["sha","sya"],"しゅ":["shu","syu"],"しょ":["sho","syo"],"ちゃ":["cha","tya"],"ちゅ":["chu","tyu"],"ちょ":["cho","tyo"],"じゃ":["ja","jya","zya"],"じゅ":["ju","jyu","zyu"],"じょ":["jo","jyo","zyo"],"ー":["-"],"っ":[""]};
+ const map={"あ":["a"],"い":["i"],"う":["u"],"え":["e"],"お":["o"],"か":["ka"],"き":["ki"],"く":["ku"],"け":["ke"],"こ":["ko"],"さ":["sa"],"し":["shi","si"],"す":["su"],"せ":["se"],"そ":["so"],"た":["ta"],"ち":["chi","ti"],"つ":["tsu","tu"],"て":["te"],"と":["to"],"な":["na"],"に":["ni"],"ぬ":["nu"],"ね":["ne"],"の":["no"],"は":["ha"],"ひ":["hi"],"ふ":["fu","hu"],"へ":["he"],"ほ":["ho"],"ま":["ma"],"み":["mi"],"む":["mu"],"め":["me"],"も":["mo"],"や":["ya"],"ゆ":["yu"],"よ":["yo"],"ら":["ra"],"り":["ri"],"る":["ru"],"れ":["re"],"ろ":["ro"],"わ":["wa"],"を":["wo"],"ん":["nn"],"が":["ga"],"ぎ":["gi"],"ぐ":["gu"],"げ":["ge"],"ご":["go"],"ざ":["za"],"じ":["ji","zi"],"ず":["zu"],"ぜ":["ze"],"ぞ":["zo"],"だ":["da"],"ぢ":["di"],"づ":["du"],"で":["de"],"ど":["do"],"ば":["ba"],"び":["bi"],"ぶ":["bu"],"べ":["be"],"ぼ":["bo"],"ぱ":["pa"],"ぴ":["pi"],"ぷ":["pu"],"ぺ":["pe"],"ぽ":["po"],"きゃ":["kya"],"きゅ":["kyu"],"きょ":["kyo"],"しゃ":["sha","sya"],"しゅ":["shu","syu"],"しょ":["sho","syo"],"ちゃ":["cha","tya"],"ちゅ":["chu","tyu"],"ちょ":["cho","tyo"],"じゃ":["ja","jya","zya"],"じゅ":["ju","jyu","zyu"],"じょ":["jo","jyo","zyo"],"ー":["-"],"っ":["ltu"]};
  return map;
 }
 function endRound(cleared){
@@ -554,7 +555,7 @@ function endRound(cleared){
  const baseCoins=Math.floor(score/100);
  const earned=difficulty===0?0:(difficulty===2?baseCoins*2:baseCoins);
  roundScore=score; coins+=earned; best=Math.max(best,score);
- document.getElementById("resultTitle").textContent=cleared?`ROUND ${round} クリア！`:`ROUND ${round} 終了`;
+ document.getElementById("resultTitle").textContent=cleared?`ROUND ${round} クリア`:`ROUND ${round} 終了`;
  document.getElementById("resultScore").textContent=score.toLocaleString();
  document.getElementById("earnedCoins").textContent=earned.toLocaleString();
  document.getElementById("resultHp").textContent=`${hp} / ${maxHp}`;
@@ -621,8 +622,8 @@ function handleKey(e){
   playBloomSound("type");typed=candidate;correctChars++;renderRomaji();renderKeys();
   if(paths.includes(typed)){
    stopTimer();
-   if(enemyIndex===queue.length-1){document.getElementById("status").textContent="クリア！";endRound(true);}
-   else{enemyIndex++;loadEnemy();startTimer();document.getElementById("status").textContent="次の問題！";}
+   if(enemyIndex===queue.length-1){document.getElementById("status").textContent="クリア";endRound(true);}
+   else{enemyIndex++;loadEnemy();startTimer();document.getElementById("status").textContent="次の問題";}
   }
  }else{
   playBloomSound("mistype");mistakes++;if(difficulty!==0)hp=Math.max(0,hp-(activeUpgrades.typo?3:5));updateHP();
